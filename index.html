@@ -1125,6 +1125,17 @@
           ctx.fillRect(nebula.x - nebula.r, nebula.y - nebula.r, nebula.r * 2, nebula.r * 2);
         }
 
+        ctx.save();
+        ctx.globalAlpha = 0.2;
+        ctx.fillStyle = "#f2d9ff";
+        ctx.shadowColor = "#d59aff";
+        ctx.shadowBlur = 18;
+        ctx.font = "700 19px system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("Seni çok seviyorum aşkım", WIDTH / 2, HEIGHT * 0.53, WIDTH - 52);
+        ctx.restore();
+
         ctx.fillStyle = "#ffffff";
         for (const star of backgroundStars) {
           const twinkle = (Math.sin(now * 0.001 * star.speed + star.phase) + 1) / 2;
