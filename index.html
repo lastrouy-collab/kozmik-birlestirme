@@ -238,6 +238,19 @@
       font-size: .66rem;
       cursor: pointer;
     }
+    .toolbar-actions { display: inline-flex; gap: 6px; }
+    .shuffle-button {
+      padding: 5px 9px;
+      border: 1px solid #b8a36c55;
+      border-radius: 8px;
+      color: #e6d197;
+      background: #d8b96b12;
+      font: inherit;
+      font-size: .66rem;
+      cursor: pointer;
+    }
+    .shuffle-button:disabled { opacity: .45; cursor: not-allowed; }
+    .shuffle-button:focus-visible { outline: 2px solid #cfb577; outline-offset: 2px; }
     .sound-toggle[aria-pressed="true"] { color: #e6d197; border-color: #d5bb7b55; }
     .sound-toggle:focus-visible { outline: 2px solid #cfb577; outline-offset: 2px; }
     .evolution {
@@ -412,7 +425,10 @@
     </div>
     <div class="game-toolbar">
       <span class="combo-status" id="comboStatus" role="status" hidden></span>
-      <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false">Ses: Kapalı</button>
+      <div class="toolbar-actions">
+        <button class="shuffle-button" id="shuffleButton" type="button" disabled>Karıştır (1)</button>
+        <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false">Ses: Kapalı</button>
+      </div>
     </div>
     <div class="evolution" aria-label="Kozmik evrim zinciri">
       <span class="evolution-label">Evrim</span>
@@ -457,6 +473,7 @@
       const nextNode2 = document.querySelector("#nextName2");
       const nextOrb2 = document.querySelector("#nextOrb2");
       const comboStatus = document.querySelector("#comboStatus");
+      const shuffleButton = document.querySelector("#shuffleButton");
       const soundToggle = document.querySelector("#soundToggle");
       const brandMark = document.querySelector(".brand-mark");
       const overlay = document.querySelector("#overlay");
@@ -743,6 +760,7 @@
       let runStartedAt = 0;
       let comboCount = 0;
       let lastMergeAt = -Infinity;
+      let shuffleUsed = false;
       let sceneHue = 0;
       let lastHueUpdate = performance.now();
       let currentLevel = 0;
@@ -771,6 +789,11 @@
       function updateSoundButton() {
         soundToggle.textContent = soundEnabled ? "Ses: Açık" : "Ses: Kapalı";
         soundToggle.setAttribute("aria-pressed", String(soundEnabled));
+      }
+
+      function updateShuffleButton() {
+        shuffleButton.disabled = !active || gameOver || shuffleUsed || animals.length < 2;
+        shuffleButton.textContent = shuffleUsed ? "Karıştırıldı" : "Karıştır (1)";
       }
 
       function playTone(frequency, duration, type, volume) {
@@ -862,6 +885,7 @@
         updateNext();
         canDrop = false;
         window.setTimeout(() => { canDrop = true; }, DIFFICULTY.dropCooldown);
+        updateShuffleButton();
       }
 
       function merge(aIndex, bIndex, now) {
@@ -892,6 +916,76 @@
         playTone(620 + Math.min(comboCount, 6) * 75, 0.18, comboCount > 1 ? "sawtooth" : "sine", comboCount > 1 ? 0.05 : 0.035);
         updateScore();
         flash = 0.13;
+        updateShuffleButton();
+      }
+
+      function shufflePlanets() {
+        if (shuffleButton.disabled) return;
+        const shuffled = animals.slice().sort((a, b) => b.r - a.r);
+        const placements = [];
+        for (const animal of shuffled) {
+          let placement = null;
+          const minY = TOP_LINE + animal.r + 14;
+          const maxY = HEIGHT - WALL - animal.r;
+          for (let attempt = 0; attempt < 1200; attempt += 1) {
+            const candidate = {
+              animal,
+              x: WALL + animal.r + Math.random() * (WIDTH - WALL * 2 - animal.r * 2),
+              y: minY + Math.random() * Math.max(0, maxY - minY),
+            };
+            const overlaps = placements.some(other => {
+              const minDistance = animal.r + other.animal.r + 3;
+              return Math.hypot(candidate.x - other.x, candidate.y - other.y) < minDistance;
+            });
+            if (!overlaps) {
+              placement = candidate;
+              break;
+            }
+          }
+          if (!placement) {
+            comboStatus.textContent = "Yeterli boş alan yok; birkaç cismi birleştirip tekrar dene.";
+            comboStatus.hidden = false;
+            return;
+          }
+          placements.push(placement);
+        }
+
+        const now = performance.now();
+        for (const placement of placements) {
+          const animal = placement.animal;
+          animal.x = placement.x;
+          animal.y = placement.y;
+          animal.vx = 0;
+          animal.vy = 0;
+          animal.born = now;
+          animal.compressionLiftAt = -Infinity;
+          animal.overLine = 0;
+          for (let i = 0; i < 4; i += 1) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 35 + Math.random() * 55;
+            particles.push({
+              x: animal.x,
+              y: animal.y,
+              vx: Math.cos(angle) * speed,
+              vy: Math.sin(angle) * speed,
+              life: 0.35 + Math.random() * 0.2,
+              maxLife: 0.55,
+              size: 1.5 + Math.random() * 2,
+              color: "#d8edff",
+              star: true,
+            });
+          }
+        }
+
+        comboCount = 0;
+        lastMergeAt = -Infinity;
+        comboStatus.textContent = "Tüm gezegenler yeniden karıştırıldı!";
+        comboStatus.hidden = false;
+        shuffleUsed = true;
+        updateShuffleButton();
+        playTone(360, 0.18, "triangle", 0.04);
+        window.setTimeout(() => playTone(540, 0.2, "sine", 0.035), 110);
+        draw();
       }
 
       function step(dt, now) {
@@ -1417,6 +1511,7 @@
         if (gameOver) return;
         gameOver = true;
         active = false;
+        updateShuffleButton();
         const isNewRecord = score > bestScore;
         if (isNewRecord) {
           bestScore = score;
@@ -1449,6 +1544,7 @@
         comboCount = 0;
         lastMergeAt = -Infinity;
         comboStatus.hidden = true;
+        shuffleUsed = false;
         brandMark.classList.remove("record-break");
         runStartedAt = performance.now();
         currentLevel = randomLevel();
@@ -1459,6 +1555,7 @@
         canDrop = true;
         gameOver = false;
         active = true;
+        updateShuffleButton();
         scoreForm.hidden = true;
         startButton.hidden = true;
         scoreSubmitStatus.textContent = "";
@@ -1523,6 +1620,7 @@
 
       startButton.textContent = "Yeni sefer";
       startButton.addEventListener("click", startGame);
+      shuffleButton.addEventListener("click", shufflePlanets);
       scoreForm.addEventListener("submit", registerPlayerAndStart);
       playerNameInput.addEventListener("input", () => playerNameInput.setCustomValidity(""));
       refreshScoresButton.addEventListener("click", loadLeaderboard);
@@ -1552,6 +1650,7 @@
       } catch (error) {}
       if (!leaderboardConfigured) submitScoreButton.textContent = "Adınla yerel oyna";
       updateNext();
+      updateShuffleButton();
       loadLeaderboard();
       draw();
       requestAnimationFrame(frame);
