@@ -403,7 +403,7 @@
     </div>
 
     <div class="instructions">
-      <span>Konum seç · tıkla veya dokunarak bırak.</span>
+      <span>Sürükleyerek konum seç · parmağını kaldırınca bırak.</span>
       <span class="next" aria-label="Sıradaki iki cisim">
         <span class="queue-piece"><span class="queue-index">1</span><span class="next-orb" id="nextOrb" aria-hidden="true"></span><span class="next-name" id="nextName">Toz</span></span>
         <span class="next-divider" aria-hidden="true">·</span>
@@ -749,6 +749,7 @@
       let nextLevel = 0;
       let next2Level = 0;
       let dropX = WIDTH / 2;
+      let aimingPointerId = null;
       let canDrop = true;
       let active = false;
       let gameOver = false;
@@ -1471,16 +1472,36 @@
 
       canvas.addEventListener("pointermove", event => {
         if (!active || gameOver) return;
+        if (aimingPointerId !== null && event.pointerId !== aimingPointerId) return;
         setDropX(pointerX(event));
         draw();
       });
 
       canvas.addEventListener("pointerdown", event => {
-        if (!active || gameOver || event.button !== 0) return;
+        if (!active || gameOver || !event.isPrimary || event.button !== 0) return;
         event.preventDefault();
         setDropX(pointerX(event));
+        if (event.pointerType === "touch" || event.pointerType === "pen") {
+          aimingPointerId = event.pointerId;
+          canvas.setPointerCapture(event.pointerId);
+          draw();
+          return;
+        }
         dropAnimal();
         draw();
+      });
+
+      canvas.addEventListener("pointerup", event => {
+        if (aimingPointerId !== event.pointerId) return;
+        event.preventDefault();
+        setDropX(pointerX(event));
+        aimingPointerId = null;
+        dropAnimal();
+        draw();
+      });
+
+      canvas.addEventListener("pointercancel", event => {
+        if (aimingPointerId === event.pointerId) aimingPointerId = null;
       });
 
       window.addEventListener("keydown", event => {
