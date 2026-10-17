@@ -1,0 +1,1540 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#080c18">
+  <title>Kozmik Birleştirme</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: "Segoe UI", Inter, system-ui, sans-serif;
+      background: #080c18;
+      color: #eef2ff;
+      font-synthesis: none;
+    }
+    * { box-sizing: border-box; }
+    body {
+      min-height: 100svh;
+      margin: 0;
+      padding: max(14px, env(safe-area-inset-top)) 14px max(14px, env(safe-area-inset-bottom));
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(ellipse at 14% 8%, #1e31503d 0, transparent 36%),
+        radial-gradient(ellipse at 90% 86%, #58386630 0, transparent 34%),
+        #080c18;
+    }
+    .layout {
+      width: min(100%, 510px);
+      margin: auto;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin: 0 2px 12px;
+    }
+    .game-title {
+      margin: 0;
+      color: #aebbd2;
+      font-size: .68rem;
+      font-weight: 800;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+    .eyebrow {
+      margin: 0 0 4px;
+      color: #98a8c4;
+      font-size: .69rem;
+      font-weight: 850;
+      letter-spacing: .19em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(1.45rem, 6vw, 2.1rem);
+      line-height: 1.05;
+      letter-spacing: -.045em;
+      font-weight: 650;
+      text-shadow: 0 2px 22px #9db7ff24;
+    }
+    .score-card {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 130px;
+      padding: 8px 14px;
+      border: 1px solid #d5bb7b38;
+      border-radius: 15px;
+      background: linear-gradient(145deg, #d3b56e17, #ffffff08);
+      text-align: right;
+      box-shadow: 0 8px 26px #05081380, inset 0 1px #ffffff18;
+    }
+    .score-summary, .best-summary { text-align: right; }
+    .score-label {
+      display: block;
+      color: #8998b2;
+      font-size: .62rem;
+      font-weight: 850;
+      letter-spacing: .15em;
+    }
+    #score {
+      display: block;
+      margin-top: 1px;
+      font-size: 1.55rem;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
+      color: #e7cb83;
+      text-shadow: 0 0 18px #c5a24a45;
+    }
+    .best-label {
+      display: block;
+      color: #8998b2;
+      font-size: .56rem;
+      font-weight: 850;
+      letter-spacing: .12em;
+    }
+    #bestScore {
+      display: block;
+      margin-top: 3px;
+      color: #c7d3e8;
+      font-size: .95rem;
+      font-weight: 850;
+      font-variant-numeric: tabular-nums;
+    }
+    .board-frame {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #b7c6e229;
+      border-radius: 18px;
+      background: #090e1b;
+      box-shadow: 0 22px 64px #02040bba, 0 0 34px #93a9e50c, inset 0 1px #ffffff20;
+      touch-action: none;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 440 / 650;
+      touch-action: none;
+      user-select: none;
+    }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 22px;
+      background: #070a13d9;
+      backdrop-filter: blur(9px);
+      text-align: center;
+    }
+    .overlay[hidden] { display: none; }
+    .dialog {
+      width: min(100%, 330px);
+      padding: 25px 22px;
+      border: 1px solid #c3d3f022;
+      border-radius: 19px;
+      background: linear-gradient(145deg, #1b2436, #111725);
+      box-shadow: 0 16px 45px #02040b99, inset 0 1px #ffffff14;
+    }
+    .brand-mark {
+      display: grid;
+      width: 54px;
+      height: 54px;
+      place-items: center;
+      margin: 0 auto 13px;
+      border: 1px solid #d6bf7b54;
+      border-radius: 50%;
+      color: #e4cc8c;
+      background: radial-gradient(circle at 35% 30%, #c9a95a38, #101725 70%);
+      box-shadow: 0 0 28px #dfc27524;
+      font-size: 1.55rem;
+    }
+    .brand-mark.record-break {
+      animation: record-celebration .7s ease-in-out 3;
+      box-shadow: 0 0 34px #ffe28b99;
+    }
+    @keyframes record-celebration {
+      50% { transform: scale(1.2) rotate(18deg); filter: brightness(1.6); }
+    }
+    .dialog h2 { margin: 0; font-size: 1.65rem; letter-spacing: -.025em; }
+    .dialog p { margin: 9px 0 19px; color: #aeb9cc; line-height: 1.55; }
+    .button {
+      min-height: 46px;
+      padding: 11px 21px;
+      border: 0;
+      border-radius: 14px;
+      color: #171715;
+      background: linear-gradient(135deg, #e3d09b, #bca36a);
+      box-shadow: 0 4px 0 #817047;
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform .1s, box-shadow .1s;
+    }
+    .button:hover { transform: translateY(-1px); }
+    .button:active { transform: translateY(3px); box-shadow: 0 1px 0 #817047; }
+    .button:focus-visible {     outline: 3px solid #e9d79e; outline-offset: 4px; }
+    .instructions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin: 11px 3px 0;
+      color: #99a6bc;
+      font-size: .79rem;
+    }
+    .next {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 10px 5px 7px;
+      border: 1px solid #b7c6e21c;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #a8b9df0e, #ffffff05);
+      box-shadow: 0 5px 18px #03071155;
+    }
+    .queue-piece { display: inline-flex; align-items: center; gap: 4px; }
+    .queue-index { color: #8491a8; font-size: .58rem; font-weight: 850; }
+    .next-name { color: #e0cc94; font-size: .68rem; font-weight: 750; }
+    .next-divider { color: #66738b; }
+    .next-orb {
+      width: 15px;
+      height: 15px;
+      border: 1px solid #ffffff80;
+      border-radius: 50%;
+      background: radial-gradient(circle at 33% 27%, #ffffff, #d0b36b 34%, #293247 82%);
+      box-shadow: 0 0 10px #d2b87159;
+    }
+    .game-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 30px;
+      margin: 5px 3px 0;
+    }
+    .combo-status {
+      color: #e9d28e;
+      font-size: .72rem;
+      font-weight: 900;
+      letter-spacing: .06em;
+      text-shadow: 0 0 12px #e9bd5c55;
+    }
+    .combo-status[hidden] { display: none; }
+    .sound-toggle {
+      padding: 5px 9px;
+      border: 1px solid #ffffff1a;
+      border-radius: 8px;
+      color: #aab6cc;
+      background: #ffffff08;
+      font: inherit;
+      font-size: .66rem;
+      cursor: pointer;
+    }
+    .sound-toggle[aria-pressed="true"] { color: #e6d197; border-color: #d5bb7b55; }
+    .sound-toggle:focus-visible { outline: 2px solid #cfb577; outline-offset: 2px; }
+    .evolution {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      overflow-x: auto;
+      margin: 10px 2px 0;
+      padding: 8px 9px;
+      border: 1px solid #ffffff13;
+      border-radius: 13px;
+      background: #ffffff05;
+      scrollbar-width: thin;
+      scrollbar-color: #7486a755 transparent;
+    }
+    .evolution-label {
+      flex: 0 0 auto;
+      margin-right: 4px;
+      color: #8995aa;
+      font-size: .63rem;
+      font-weight: 850;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .evolution-animal {
+      flex: 0 0 auto;
+      padding: 4px 7px;
+      border: 1px solid #ffffff12;
+      border-radius: 7px;
+      color: #b9c5d9;
+      background: #ffffff06;
+      font-size: .62rem;
+      font-weight: 700;
+    }
+    .evolution-arrow { flex: 0 0 auto; color: #aa9461; font-size: .7rem; }
+    .leaderboard {
+      margin: 12px 2px 0;
+      padding: 14px 15px;
+      border: 1px solid #c1cee018;
+      border-radius: 14px;
+      background: linear-gradient(140deg, #ffffff08, #ffffff03);
+    }
+    .leaderboard-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .leaderboard h2 {
+      margin: 0;
+      color: #e4d2a1;
+      font-size: .84rem;
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+    .refresh-scores {
+      padding: 5px 9px;
+      border: 1px solid #ffffff1a;
+      border-radius: 8px;
+      color: #aab6cc;
+      background: #ffffff08;
+      font: inherit;
+      font-size: .68rem;
+      cursor: pointer;
+    }
+    .refresh-scores:focus-visible { outline: 2px solid #cfb577; outline-offset: 2px; }
+    #leaderboardStatus {
+      margin: 0;
+      color: #8995aa;
+      font-size: .72rem;
+      line-height: 1.45;
+    }
+    #leaderboardList {
+      display: grid;
+      gap: 4px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .leaderboard-row {
+      display: grid;
+      grid-template-columns: 26px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 8px;
+      border-radius: 8px;
+      color: #c5cede;
+      background: #ffffff05;
+      font-size: .76rem;
+    }
+    .leaderboard-row:first-child {
+      color: #f0d994;
+      background: linear-gradient(90deg, #d8b96b18, #ffffff04);
+    }
+    .leaderboard-place { color: #8b98b0; font-size: .68rem; font-weight: 850; }
+    .leaderboard-name { overflow: hidden; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+    .leaderboard-score { color: #e5d29a; font-variant-numeric: tabular-nums; font-weight: 850; }
+    .score-form {
+      display: grid;
+      gap: 8px;
+      margin: 0 0 14px;
+      text-align: left;
+    }
+    .score-form[hidden] { display: none; }
+    .score-form label { color: #bac4d6; font-size: .76rem; font-weight: 700; }
+    .score-form input {
+      width: 100%;
+      min-height: 43px;
+      padding: 9px 11px;
+      border: 1px solid #ffffff26;
+      border-radius: 10px;
+      color: #f0f3fb;
+      background: #080d17;
+      font: inherit;
+    }
+    .score-form input:focus-visible { outline: 2px solid #cfb577; outline-offset: 2px; }
+    .score-form button { width: 100%; }
+    #scoreSubmitStatus { min-height: 1.35em; margin: 0; color: #b8c2d5; font-size: .72rem; }
+    @media (max-height: 760px) and (min-width: 600px) {
+      .layout { width: min(100%, 430px); }
+      canvas { aspect-ratio: 440 / 600; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="layout">
+    <header>
+      <p class="game-title">Kozmik Birleştirme</p>
+      <div class="score-card" aria-label="Skor ve kişisel rekor">
+        <div class="score-summary">
+          <span class="score-label">SKOR</span>
+          <span id="score" aria-live="polite">0</span>
+        </div>
+        <div class="best-summary">
+          <span class="best-label">REKOR</span>
+          <span id="bestScore">0</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="board-frame">
+      <canvas id="game" width="440" height="650" aria-label="Kozmik cisimleri birleştirme oyun alanı">
+        Oyunu oynamak için canvas destekli bir tarayıcı kullanın.
+      </canvas>
+      <section class="overlay" id="overlay" aria-labelledby="overlayTitle">
+        <div class="dialog">
+          <div class="brand-mark" aria-hidden="true">✦</div>
+          <h2 id="overlayTitle">Yörüngeye gir</h2>
+          <p id="overlayText">Gök cisimlerini bırak, eşleşenleri birleştir ve yıldız sistemini büyüt. Kütleyi kritik çizginin altında tut.</p>
+          <form class="score-form" id="scoreForm">
+            <label for="playerName">Sana özel kullanıcı adını belirle</label>
+            <input id="playerName" name="playerName" type="text" autocomplete="username" maxlength="18" minlength="3" pattern="[A-Za-z0-9_]+" required placeholder="Örn. KozmikGezgin" aria-describedby="scoreSubmitStatus">
+            <button class="button" id="submitScore" type="submit">Kullanıcı adını al ve başla</button>
+          </form>
+          <p id="scoreSubmitStatus" role="status">Çevrim içi kullanıcı adı ve skor tablosu için Supabase bağlantısı gerekir.</p>
+          <button class="button" id="startButton" type="button" hidden>Seferi başlat</button>
+        </div>
+      </section>
+    </div>
+
+    <div class="instructions">
+      <span>Konum seç · tıkla veya dokunarak bırak.</span>
+      <span class="next" aria-label="Sıradaki iki cisim">
+        <span class="queue-piece"><span class="queue-index">1</span><span class="next-orb" id="nextOrb" aria-hidden="true"></span><span class="next-name" id="nextName">Toz</span></span>
+        <span class="next-divider" aria-hidden="true">·</span>
+        <span class="queue-piece"><span class="queue-index">2</span><span class="next-orb" id="nextOrb2" aria-hidden="true"></span><span class="next-name" id="nextName2">Toz</span></span>
+      </span>
+    </div>
+    <div class="game-toolbar">
+      <span class="combo-status" id="comboStatus" role="status" hidden></span>
+      <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false">Ses: Kapalı</button>
+    </div>
+    <div class="evolution" aria-label="Kozmik evrim zinciri">
+      <span class="evolution-label">Evrim</span>
+      <span class="evolution-animal">Toz</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Kaya</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Ay</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Gezegen</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Halkalı</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Gaz devi</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Buz devi</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Süper dünya</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Cüce yıldız</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Yıldız</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Nötron</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Pulsar</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Magnetar</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Kara delik</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Quasar</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Bulutsu</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Yıldız kümesi</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Galaksi çekirdeği</span>
+    </div>
+    <section class="leaderboard" aria-labelledby="leaderboardTitle">
+      <div class="leaderboard-head">
+        <h2 id="leaderboardTitle">Oyuncular arası ilk 10</h2>
+        <button class="refresh-scores" id="refreshScores" type="button">Yenile</button>
+      </div>
+      <p id="leaderboardStatus" role="status">Skorlar yükleniyor…</p>
+      <ol id="leaderboardList" aria-label="En yüksek skorlar"></ol>
+    </section>
+  </main>
+
+  <script>
+    "use strict";
+    (() => {
+      const canvas = document.querySelector("#game");
+      const ctx = canvas.getContext("2d");
+      const scoreNode = document.querySelector("#score");
+      const bestScoreNode = document.querySelector("#bestScore");
+      const nextNode = document.querySelector("#nextName");
+      const nextOrb = document.querySelector("#nextOrb");
+      const nextNode2 = document.querySelector("#nextName2");
+      const nextOrb2 = document.querySelector("#nextOrb2");
+      const comboStatus = document.querySelector("#comboStatus");
+      const soundToggle = document.querySelector("#soundToggle");
+      const brandMark = document.querySelector(".brand-mark");
+      const overlay = document.querySelector("#overlay");
+      const overlayTitle = document.querySelector("#overlayTitle");
+      const overlayText = document.querySelector("#overlayText");
+      const startButton = document.querySelector("#startButton");
+      const scoreForm = document.querySelector("#scoreForm");
+      const playerNameInput = document.querySelector("#playerName");
+      const submitScoreButton = document.querySelector("#submitScore");
+      const scoreSubmitStatus = document.querySelector("#scoreSubmitStatus");
+      const leaderboardStatus = document.querySelector("#leaderboardStatus");
+      const leaderboardList = document.querySelector("#leaderboardList");
+      const refreshScoresButton = document.querySelector("#refreshScores");
+
+      // Fill these from Supabase Project Settings > API. Never use a service_role key here.
+      const SUPABASE_URL = "";
+      const SUPABASE_ANON_KEY = "";
+      const SESSION_STORAGE_KEY = "orbit-auth-session";
+      const PLAYER_NAME_KEY = "orbit-player-name";
+      const BEST_SCORE_KEY = "orbit-best-score";
+      const SOUND_ENABLED_KEY = "orbit-sound-enabled";
+
+      const WIDTH = 440;
+      const HEIGHT = 650;
+      const TOP_LINE = 116;
+      const WALL = 15;
+      const backgroundStars = Array.from({ length: 118 }, (_, i) => ({
+        x: WALL + Math.random() * (WIDTH - WALL * 2),
+        y: Math.random() * HEIGHT,
+        radius: i % 11 === 0 ? 1.8 : 0.9,
+        phase: i * 2.39996,
+        speed: 0.7 + (i % 5) * 0.22,
+      }));
+      let shootingStars = [];
+      let nextShootingStarAt = performance.now() + 4000 + Math.random() * 5000;
+      const ANIMALS = [
+        { name: "Toz", radius: 13, color: "#aaa0c1", accent: "#c5bbdc", surface: "dust" },
+        { name: "Kaya", radius: 15, color: "#a66f66", accent: "#e3a07a", surface: "rock" },
+        { name: "Ay", radius: 18, color: "#a4aab3", accent: "#e1e2d9", surface: "crater" },
+        { name: "Gezegen", radius: 21, color: "#3e82a1", accent: "#82d3d1", surface: "ocean" },
+        { name: "Halkalı", radius: 25, color: "#c39a61", accent: "#f0d99c", surface: "bands", ring: true },
+        { name: "Gaz devi", radius: 30, color: "#b9785e", accent: "#e7b47a", surface: "bands" },
+        { name: "Buz devi", radius: 35, color: "#477eaa", accent: "#8ad6e5", surface: "bands", ring: true },
+        { name: "Süper dünya", radius: 41, color: "#4c8c79", accent: "#c6c27a", surface: "continents" },
+        { name: "Cüce yıldız", radius: 48, color: "#a95e39", accent: "#f1b467", surface: "glow" },
+        { name: "Yıldız", radius: 56, color: "#d79a4d", accent: "#fff0b0", surface: "star", glow: true },
+        { name: "Nötron", radius: 65, color: "#6c79be", accent: "#b7c6ff", surface: "pulse", glow: true },
+        { name: "Pulsar", radius: 74, color: "#5d89b1", accent: "#c3e5ff", surface: "pulse", ring: true, glow: true },
+        { name: "Magnetar", radius: 83, color: "#9863b3", accent: "#f0b4ff", surface: "magnetic", ring: true, glow: true },
+        { name: "Kara delik", radius: 92, color: "#17131f", accent: "#f1c879", surface: "blackhole", ring: true, glow: true },
+        { name: "Quasar", radius: 101, color: "#5c6ea8", accent: "#eac57a", surface: "magnetic", ring: true, glow: true },
+        { name: "Bulutsu", radius: 110, color: "#6f4a8e", accent: "#d8a3ee", surface: "glow", ring: true, glow: true },
+        { name: "Yıldız kümesi", radius: 119, color: "#405f83", accent: "#e8d59d", surface: "cluster", ring: true, glow: true },
+        { name: "Galaksi çekirdeği", radius: 128, color: "#6e456f", accent: "#ffe0a0", surface: "galaxy", ring: true, glow: true },
+      ];
+      const DIFFICULTY = {
+        maxDropLevel: 4,
+        gravity: 1680,
+        dropCooldown: 490,
+        lineGrace: 0.48,
+      };
+      const leaderboardConfigured = /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL)
+        && SUPABASE_ANON_KEY.length > 20;
+      let authSession = null;
+      let playerName = "";
+      let bestScore = 0;
+      let soundEnabled = false;
+      let audioContext = null;
+
+      function supabaseHeaders(extra, token) {
+        return Object.assign({
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${token || SUPABASE_ANON_KEY}`,
+        }, extra || {});
+      }
+
+      function readSavedSession() {
+        try {
+          const saved = JSON.parse(localStorage.getItem(SESSION_STORAGE_KEY) || "null");
+          return saved && typeof saved.access_token === "string" && typeof saved.refresh_token === "string" ? saved : null;
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function saveSession(session) {
+        if (!session || typeof session.access_token !== "string" || typeof session.refresh_token !== "string") {
+          throw new Error("Supabase geçerli bir oturum döndürmedi.");
+        }
+        authSession = session;
+        try {
+          localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
+        } catch (error) {
+          throw new Error("Oyuncu oturumu bu tarayıcıda saklanamadı.");
+        }
+      }
+
+      async function responseError(response, fallback) {
+        let body = null;
+        try { body = await response.json(); } catch (error) {}
+        const message = body && (body.message || body.msg || body.error_description || body.error);
+        if (response.status === 409 || /username.*taken|already.*claim|kullanıcı adı alınmış/i.test(String(message))) {
+          return new Error("Bu kullanıcı adı başka bir oyuncu tarafından alınmış. Başka bir ad dene.");
+        }
+        return new Error(message || `${fallback} (HTTP ${response.status}).`);
+      }
+
+      async function createAnonymousSession() {
+        const response = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
+          method: "POST",
+          headers: supabaseHeaders({ "Content-Type": "application/json" }),
+          body: JSON.stringify({ data: {} }),
+        });
+        if (!response.ok) throw await responseError(response, "Oyuncu hesabı oluşturulamadı");
+        const session = await response.json();
+        saveSession(session);
+        return session;
+      }
+
+      async function refreshSession() {
+        if (!authSession || !authSession.refresh_token) return createAnonymousSession();
+        const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
+          method: "POST",
+          headers: supabaseHeaders({ "Content-Type": "application/json" }),
+          body: JSON.stringify({ refresh_token: authSession.refresh_token }),
+        });
+        if (!response.ok) {
+          authSession = null;
+          throw await responseError(response, "Oyuncu oturumu yenilenemedi");
+        }
+        const session = await response.json();
+        saveSession(session);
+        return session;
+      }
+
+      async function authenticatedFetch(url, options) {
+        if (!authSession) authSession = readSavedSession();
+        if (!authSession) {
+          if (playerName) {
+            throw new Error("Bu kullanıcı adına bağlı oturum bu tarayıcıda bulunamadı; aynı adı güvenle doğrulayamıyoruz.");
+          }
+          await createAnonymousSession();
+        }
+        let response = await fetch(url, Object.assign({}, options, {
+          headers: supabaseHeaders(options && options.headers, authSession.access_token),
+        }));
+        if (response.status === 401) {
+          await refreshSession();
+          response = await fetch(url, Object.assign({}, options, {
+            headers: supabaseHeaders(options && options.headers, authSession.access_token),
+          }));
+        }
+        return response;
+      }
+
+      async function claimPlayerName(requestedName) {
+        const response = await authenticatedFetch(`${SUPABASE_URL}/rest/v1/rpc/claim_orbit_username`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ requested_name: requestedName }),
+        });
+        if (!response.ok) throw await responseError(response, "Kullanıcı adı kaydedilemedi");
+        const claimedName = await response.json();
+        if (typeof claimedName !== "string" || !claimedName) {
+          throw new Error("Sunucu kullanıcı adı kaydını doğrulayamadı.");
+        }
+        playerName = claimedName;
+        try { localStorage.setItem(PLAYER_NAME_KEY, playerName); } catch (error) {}
+      }
+
+      function setLeaderboardMessage(text, isError) {
+        leaderboardStatus.textContent = text;
+        leaderboardStatus.style.color = isError ? "#e39a91" : "";
+      }
+
+      function renderLeaderboard(rows) {
+        leaderboardList.replaceChildren();
+        if (!rows.length) {
+          setLeaderboardMessage("Henüz skor yok. İlk rekoru sen bırak!", false);
+          return;
+        }
+
+        rows.forEach((row, index) => {
+          const item = document.createElement("li");
+          item.className = "leaderboard-row";
+          const place = document.createElement("span");
+          place.className = "leaderboard-place";
+          place.textContent = `${index + 1}.`;
+          const name = document.createElement("span");
+          name.className = "leaderboard-name";
+          name.textContent = row.player_name;
+          const points = document.createElement("span");
+          points.className = "leaderboard-score";
+          points.textContent = Number(row.score).toLocaleString("tr-TR");
+          item.append(place, name, points);
+          leaderboardList.append(item);
+        });
+        setLeaderboardMessage("Her oyuncunun en yüksek skoru gösteriliyor.", false);
+      }
+
+      async function loadLeaderboard() {
+        if (!leaderboardConfigured) {
+          setLeaderboardMessage("Çevrim içi tabloyu açmak için Supabase URL ve anon key yapılandırılmalı.", false);
+          return;
+        }
+
+        refreshScoresButton.disabled = true;
+        setLeaderboardMessage("Skorlar yükleniyor…", false);
+        try {
+          const response = await fetch(
+            `${SUPABASE_URL}/rest/v1/orbit_leaderboard?select=player_name,score&order=score.desc,player_name.asc&limit=10`,
+            { headers: supabaseHeaders() }
+          );
+          if (!response.ok) throw new Error(`Skor tablosu yüklenemedi (HTTP ${response.status}).`);
+          renderLeaderboard(await response.json());
+        } catch (error) {
+          setLeaderboardMessage(error.message || "Skor tablosuna bağlanılamadı.", true);
+        } finally {
+          refreshScoresButton.disabled = false;
+        }
+      }
+
+      async function registerPlayerAndStart(event) {
+        event.preventDefault();
+        const requestedName = playerNameInput.value.trim();
+        if (!/^[A-Za-z0-9_]{3,18}$/.test(requestedName)) {
+          playerNameInput.setCustomValidity("Kullanıcı adı 3–18 karakter olmalı; yalnızca İngilizce harf, rakam ve alt çizgi kullan.");
+          playerNameInput.reportValidity();
+          return;
+        }
+        playerNameInput.setCustomValidity("");
+
+        if (!leaderboardConfigured) {
+          playerName = requestedName;
+          try { localStorage.setItem(PLAYER_NAME_KEY, playerName); } catch (error) {}
+          scoreSubmitStatus.textContent = "Supabase bağlı değil; adın başka oyuncular için ayrılamaz ve skorun çevrim içi kaydedilmez. Yerel oyun başlıyor…";
+          window.setTimeout(() => {
+            scoreForm.hidden = true;
+            startGame();
+          }, 350);
+          return;
+        }
+
+        submitScoreButton.disabled = true;
+        scoreSubmitStatus.textContent = "Kullanıcı adı kontrol ediliyor ve sana ayrılıyor…";
+        try {
+          await claimPlayerName(requestedName);
+          scoreSubmitStatus.textContent = `@${playerName} adı sana ayrıldı. Sefer başlıyor…`;
+          window.setTimeout(() => {
+            scoreForm.hidden = true;
+            startGame();
+          }, 350);
+        } catch (error) {
+          scoreSubmitStatus.textContent = error.message || "Kullanıcı adı kaydedilemedi. Bağlantını kontrol edip tekrar dene.";
+          submitScoreButton.disabled = false;
+        }
+      }
+
+      async function submitLeaderboardScore() {
+        if (!leaderboardConfigured || !playerName) {
+          scoreSubmitStatus.textContent = "Skor kaydedilemedi: oyuncu hesabı veya çevrim içi bağlantı hazır değil.";
+          return;
+        }
+
+        scoreSubmitStatus.textContent = `@${playerName} için skor gönderiliyor…`;
+        try {
+          const response = await authenticatedFetch(`${SUPABASE_URL}/rest/v1/rpc/submit_orbit_score`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ p_score: score }),
+          });
+          if (!response.ok) throw await responseError(response, "Skor gönderilemedi");
+          scoreSubmitStatus.textContent = `Skorun @${playerName} adıyla kaydedildi.`;
+          await loadLeaderboard();
+        } catch (error) {
+          scoreSubmitStatus.textContent = error.message || "Skor gönderilemedi. Bağlantını kontrol edip tekrar dene.";
+        }
+      }
+
+      let animals = [];
+      let particles = [];
+      let scoreBursts = [];
+      let score = 0;
+      let runStartedAt = 0;
+      let comboCount = 0;
+      let lastMergeAt = -Infinity;
+      let sceneHue = 0;
+      let lastHueUpdate = performance.now();
+      let currentLevel = 0;
+      let nextLevel = 0;
+      let next2Level = 0;
+      let dropX = WIDTH / 2;
+      let canDrop = true;
+      let active = false;
+      let gameOver = false;
+      let lastFrame = 0;
+      let accumulator = 0;
+      let flash = 0;
+      function randomLevel() {
+        return Math.floor(Math.random() * (DIFFICULTY.maxDropLevel + 1));
+      }
+
+      function radiusOf(level) {
+        return ANIMALS[Math.min(level, ANIMALS.length - 1)].radius;
+      }
+
+      function updateScore() {
+        scoreNode.textContent = String(score);
+      }
+
+      function updateSoundButton() {
+        soundToggle.textContent = soundEnabled ? "Ses: Açık" : "Ses: Kapalı";
+        soundToggle.setAttribute("aria-pressed", String(soundEnabled));
+      }
+
+      function playTone(frequency, duration, type, volume) {
+        if (!soundEnabled) return;
+        try {
+          if (!audioContext) audioContext = new window.AudioContext();
+          if (audioContext.state === "suspended") {
+            void audioContext.resume().catch(() => {
+              soundEnabled = false;
+              updateSoundButton();
+              scoreSubmitStatus.textContent = "Ses başlatılamadı; tekrar açmak için ses düğmesine bas.";
+            });
+          }
+          const oscillator = audioContext.createOscillator();
+          const gain = audioContext.createGain();
+          const startAt = audioContext.currentTime;
+          oscillator.type = type;
+          oscillator.frequency.setValueAtTime(frequency, startAt);
+          oscillator.frequency.exponentialRampToValueAtTime(Math.max(45, frequency * 0.72), startAt + duration);
+          gain.gain.setValueAtTime(volume, startAt);
+          gain.gain.exponentialRampToValueAtTime(0.001, startAt + duration);
+          oscillator.connect(gain);
+          gain.connect(audioContext.destination);
+          oscillator.start(startAt);
+          oscillator.stop(startAt + duration);
+        } catch (error) {
+          soundEnabled = false;
+          updateSoundButton();
+          scoreSubmitStatus.textContent = "Bu tarayıcıda ses efektleri başlatılamadı.";
+        }
+      }
+
+      function toggleSound() {
+        soundEnabled = !soundEnabled;
+        updateSoundButton();
+        try { localStorage.setItem(SOUND_ENABLED_KEY, String(soundEnabled)); } catch (error) {}
+        if (soundEnabled) playTone(740, 0.11, "sine", 0.04);
+      }
+
+      function setDropX(x) {
+        const radius = radiusOf(currentLevel);
+        dropX = Math.max(WALL + radius, Math.min(WIDTH - WALL - radius, x));
+      }
+
+      function pointerX(event) {
+        const rect = canvas.getBoundingClientRect();
+        return (event.clientX - rect.left) * WIDTH / rect.width;
+      }
+
+      function addAnimal(level, x, y, vx, vy, born) {
+        animals.push({
+          level, x, y, vx, vy,
+          r: radiusOf(level),
+          born,
+          compressionLiftAt: -Infinity,
+          overLine: 0,
+          wobble: Math.random() * Math.PI * 2,
+        });
+      }
+
+      function makeMergeEffects(x, y, points) {
+        const colors = ["#fff1a8", "#ffc478", "#ff91b3", "#a8edff", "#ffffff"];
+        for (let i = 0; i < 20; i += 1) {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 65 + Math.random() * 190;
+          particles.push({
+            x, y,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed - 28,
+            life: 0.48 + Math.random() * 0.38,
+            maxLife: 0.86,
+            size: 2 + Math.random() * 4,
+            color: colors[i % colors.length],
+            star: i % 3 === 0,
+          });
+        }
+        scoreBursts.push({ x, y: y - 20, text: `+${points}`, life: 0.85 });
+      }
+
+      function dropAnimal() {
+        if (!active || gameOver || !canDrop) return;
+        playTone(420 + currentLevel * 38, 0.08, "triangle", 0.025);
+        const radius = radiusOf(currentLevel);
+        setDropX(dropX);
+        addAnimal(currentLevel, dropX, TOP_LINE + radius + 3, 0, 0, performance.now());
+        currentLevel = nextLevel;
+        nextLevel = next2Level;
+        next2Level = randomLevel();
+        updateNext();
+        canDrop = false;
+        window.setTimeout(() => { canDrop = true; }, DIFFICULTY.dropCooldown);
+      }
+
+      function merge(aIndex, bIndex, now) {
+        const a = animals[aIndex];
+        const b = animals[bIndex];
+        const nextLevelValue = a.level + 1;
+        const x = (a.x + b.x) / 2;
+        const y = (a.y + b.y) / 2;
+        const vx = (a.vx + b.vx) / 2;
+        const vy = Math.min((a.vy + b.vy) / 2 - 90, 0);
+        comboCount = now - lastMergeAt <= 2600 ? comboCount + 1 : 1;
+        lastMergeAt = now;
+        animals.splice(bIndex, 1);
+        animals.splice(aIndex, 1);
+        let basePoints;
+        if (nextLevelValue < ANIMALS.length) {
+          addAnimal(nextLevelValue, x, y, vx, vy, now);
+          basePoints = (nextLevelValue + 1) * 5;
+        } else {
+          basePoints = 500;
+        }
+        const comboBonus = comboCount > 1 ? Math.floor(basePoints * Math.min(comboCount - 1, 4) * 0.2) : 0;
+        const points = basePoints + comboBonus;
+        score += points;
+        makeMergeEffects(x, y, points);
+        comboStatus.hidden = comboCount < 2;
+        if (comboCount > 1) comboStatus.textContent = `KOMBO x${comboCount} · +${comboBonus}`;
+        playTone(620 + Math.min(comboCount, 6) * 75, 0.18, comboCount > 1 ? "sawtooth" : "sine", comboCount > 1 ? 0.05 : 0.035);
+        updateScore();
+        flash = 0.13;
+      }
+
+      function step(dt, now) {
+        const safeDt = Math.min(dt, 1 / 30);
+        for (const animal of animals) {
+          animal.vy = Math.min(animal.vy + DIFFICULTY.gravity * safeDt, 1600);
+          animal.x += animal.vx * safeDt;
+          animal.y += animal.vy * safeDt;
+          animal.vx *= Math.pow(0.996, safeDt * 60);
+          animal.wobble += safeDt * 3;
+
+          if (animal.x - animal.r < WALL) {
+            animal.x = WALL + animal.r;
+            animal.vx = Math.abs(animal.vx) * 0.48;
+          } else if (animal.x + animal.r > WIDTH - WALL) {
+            animal.x = WIDTH - WALL - animal.r;
+            animal.vx = -Math.abs(animal.vx) * 0.48;
+          }
+          if (animal.y + animal.r > HEIGHT - WALL) {
+            animal.y = HEIGHT - WALL - animal.r;
+            if (animal.vy > 45) animal.vy *= -0.16;
+            else animal.vy = 0;
+            animal.vx *= 0.985;
+          }
+        }
+
+        for (let pass = 0; pass < 6; pass += 1) {
+          for (let i = 0; i < animals.length; i += 1) {
+            const a = animals[i];
+            for (let j = i + 1; j < animals.length; j += 1) {
+              const b = animals[j];
+              let dx = b.x - a.x;
+              let dy = b.y - a.y;
+              let distance = Math.hypot(dx, dy);
+              const minimum = a.r + b.r;
+              if (distance >= minimum) continue;
+              if (distance < 0.001) {
+                dx = 0;
+                dy = 1;
+                distance = 1;
+              }
+
+              if (a.level === b.level && now - Math.max(a.born, b.born) > 120) {
+                merge(i, j, now);
+                pass = 6;
+                break;
+              }
+
+              const nx = dx / distance;
+              const ny = dy / distance;
+              const overlap = minimum - distance;
+              if (overlap > 5 && Math.abs(ny) > 0.72) {
+                const upper = a.y < b.y ? a : b;
+                if (now - upper.born > 240 && now - upper.compressionLiftAt > 650 && upper.vy > -80) {
+                  upper.vy = -Math.min(300, 120 + overlap * 7);
+                  upper.compressionLiftAt = now;
+                }
+              }
+              const totalMass = a.r * a.r + b.r * b.r;
+              const correction = Math.max(0, overlap - 0.15) * 0.92;
+              const moveA = correction * b.r * b.r / totalMass;
+              const moveB = correction * a.r * a.r / totalMass;
+              a.x -= nx * moveA;
+              a.y -= ny * moveA;
+              b.x += nx * moveB;
+              b.y += ny * moveB;
+
+              const relativeVelocity = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
+              if (relativeVelocity < 0) {
+                const impulse = -(0.12 * relativeVelocity) / (1 / (a.r * a.r) + 1 / (b.r * b.r));
+                a.vx -= impulse * nx / (a.r * a.r);
+                a.vy -= impulse * ny / (a.r * a.r);
+                b.vx += impulse * nx / (b.r * b.r);
+                b.vy += impulse * ny / (b.r * b.r);
+              }
+            }
+            if (pass === 4) break;
+          }
+        }
+
+        for (const animal of animals) {
+          if (animal.y - animal.r < TOP_LINE) {
+            animal.overLine += safeDt;
+            if (animal.overLine > DIFFICULTY.lineGrace) {
+              endGame();
+              break;
+            }
+          } else {
+            animal.overLine = Math.max(0, animal.overLine - safeDt * 2);
+          }
+        }
+        for (const particle of particles) {
+          particle.life -= safeDt;
+          particle.vy += 200 * safeDt;
+          particle.x += particle.vx * safeDt;
+          particle.y += particle.vy * safeDt;
+          particle.vx *= Math.pow(0.08, safeDt);
+        }
+        particles = particles.filter(particle => particle.life > 0);
+        for (const burst of scoreBursts) {
+          burst.life -= safeDt;
+          burst.y -= 34 * safeDt;
+        }
+        scoreBursts = scoreBursts.filter(burst => burst.life > 0);
+        flash = Math.max(0, flash - safeDt);
+      }
+
+      function updateNext() {
+        const data = ANIMALS[nextLevel];
+        nextNode.textContent = data.name;
+        nextOrb.style.background = `radial-gradient(circle at 32% 28%, #ffffff, ${data.color} 38%, #101522 88%)`;
+        nextOrb.style.boxShadow = `0 0 12px ${data.accent}55`;
+        const following = ANIMALS[next2Level];
+        nextNode2.textContent = following.name;
+        nextOrb2.style.background = `radial-gradient(circle at 32% 28%, #ffffff, ${following.color} 38%, #101522 88%)`;
+        nextOrb2.style.boxShadow = `0 0 12px ${following.accent}55`;
+      }
+
+      function drawBackground(now) {
+        const sky = ctx.createLinearGradient(0, 0, 0, HEIGHT);
+        sky.addColorStop(0, "#080c18");
+        sky.addColorStop(0.5, "#101526");
+        sky.addColorStop(1, "#171627");
+        ctx.fillStyle = sky;
+        ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+        const nebulae = [
+          { x: 99, y: 291, r: 184, color: "#4d3970" },
+          { x: 368, y: 435, r: 206, color: "#254d69" },
+          { x: 217, y: 563, r: 165, color: "#553455" },
+        ];
+        for (const nebula of nebulae) {
+          const haze = ctx.createRadialGradient(nebula.x, nebula.y, 0, nebula.x, nebula.y, nebula.r);
+          haze.addColorStop(0, nebula.color + "42");
+          haze.addColorStop(1, nebula.color + "00");
+          ctx.fillStyle = haze;
+          ctx.fillRect(nebula.x - nebula.r, nebula.y - nebula.r, nebula.r * 2, nebula.r * 2);
+        }
+
+        ctx.fillStyle = "#ffffff";
+        for (const star of backgroundStars) {
+          const twinkle = (Math.sin(now * 0.001 * star.speed + star.phase) + 1) / 2;
+          ctx.globalAlpha = 0.38 + twinkle * 0.58;
+          ctx.shadowColor = "#d9e8ff";
+          ctx.shadowBlur = 2 + twinkle * (star.radius > 1 ? 10 : 5);
+          ctx.beginPath();
+          ctx.arc(star.x, star.y, star.radius * (0.8 + twinkle * 0.35), 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        ctx.shadowBlur = 0;
+
+        if (!shootingStars.length && now >= nextShootingStarAt) {
+          const count = Math.random() < 0.28 ? 2 : 1;
+          shootingStars = Array.from({ length: count }, () => ({
+            x: WALL + Math.random() * (WIDTH - WALL * 2),
+            y: Math.random() * HEIGHT,
+            angle: Math.random() * Math.PI * 2,
+            startedAt: now,
+          }));
+        }
+        for (const shootingStar of shootingStars) {
+          const progress = (now - shootingStar.startedAt) / 950;
+          if (progress >= 1) {
+            continue;
+          }
+          const directionX = Math.cos(shootingStar.angle);
+          const directionY = Math.sin(shootingStar.angle);
+          const headX = shootingStar.x + directionX * progress * 310;
+          const headY = shootingStar.y + directionY * progress * 310;
+          const tailLength = 110;
+          const tailX = headX - directionX * tailLength;
+          const tailY = headY - directionY * tailLength;
+          const tail = ctx.createLinearGradient(tailX, tailY, headX, headY);
+          tail.addColorStop(0, "#d9e8ff00");
+          tail.addColorStop(1, "#ffffff");
+          ctx.save();
+          ctx.strokeStyle = tail;
+          ctx.lineWidth = 2.8;
+          ctx.shadowColor = "#d9e8ff";
+          ctx.shadowBlur = 18;
+          ctx.beginPath();
+          ctx.moveTo(tailX, tailY);
+          ctx.lineTo(headX, headY);
+          ctx.stroke();
+          ctx.fillStyle = "#ffffff";
+          ctx.beginPath();
+          ctx.arc(headX, headY, 2.2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+        if (shootingStars.length) {
+          shootingStars = shootingStars.filter(star => now - star.startedAt < 950);
+          if (!shootingStars.length) nextShootingStarAt = now + 6500 + Math.random() * 6500;
+        }
+
+        const floor = ctx.createLinearGradient(0, HEIGHT - 35, 0, HEIGHT);
+        floor.addColorStop(0, "#25263a");
+        floor.addColorStop(1, "#131522");
+        ctx.fillStyle = floor;
+        ctx.fillRect(0, HEIGHT - WALL, WIDTH, WALL);
+
+        ctx.fillStyle = "#111522";
+        ctx.fillRect(0, 0, WALL, HEIGHT);
+        ctx.fillRect(WIDTH - WALL, 0, WALL, HEIGHT);
+        ctx.fillStyle = "#ffffff0e";
+        ctx.fillRect(WALL, 0, 2, HEIGHT);
+        ctx.fillRect(WIDTH - WALL - 2, 0, 2, HEIGHT);
+
+        ctx.save();
+        ctx.setLineDash([5, 8]);
+        ctx.lineWidth = 1.5;
+        ctx.strokeStyle = "#d1aa70";
+        ctx.shadowColor = "#dab978";
+        ctx.shadowBlur = 8;
+        ctx.globalAlpha = 0.8;
+        ctx.beginPath();
+        ctx.moveTo(WALL, TOP_LINE);
+        ctx.lineTo(WIDTH - WALL, TOP_LINE);
+        ctx.stroke();
+        ctx.restore();
+
+        ctx.fillStyle = "#dec58e";
+        ctx.shadowColor = "#dab978";
+        ctx.shadowBlur = 7;
+        ctx.font = "750 9px system-ui, sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillText("KRİTİK YÖRÜNGE", WALL + 10, TOP_LINE - 9);
+        ctx.shadowBlur = 0;
+      }
+
+      function drawAnimal(animal) {
+        const data = ANIMALS[animal.level];
+        const age = Math.max(0, performance.now() - animal.born);
+        const pop = age < 220 ? 1 + Math.sin((age / 220) * Math.PI) * 0.12 : 1;
+        const pulse = (1 + Math.sin(animal.wobble) * 0.012) * pop;
+        ctx.save();
+        ctx.translate(animal.x, animal.y);
+        ctx.scale(pulse, pulse);
+        const r = animal.r;
+
+        if (data.ring) {
+          ctx.save();
+          ctx.rotate(-0.28);
+          ctx.strokeStyle = data.accent + "aa";
+          ctx.lineWidth = Math.max(2, r * 0.14);
+          ctx.beginPath();
+          ctx.ellipse(0, 0, r * 1.42, r * 0.48, 0, Math.PI, Math.PI * 2);
+          ctx.stroke();
+          ctx.strokeStyle = "#ffffff55";
+          ctx.lineWidth = Math.max(1, r * 0.025);
+          ctx.beginPath();
+          ctx.ellipse(0, 0, r * 1.42, r * 0.48, 0, Math.PI, Math.PI * 2);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        if (data.glow) {
+          ctx.shadowColor = data.accent + "b0";
+          ctx.shadowBlur = r * 0.48;
+        } else {
+          ctx.shadowColor = "#02040b";
+          ctx.shadowBlur = 12;
+        }
+        ctx.shadowOffsetY = 4;
+        const sphere = ctx.createRadialGradient(-r * 0.38, -r * 0.42, r * 0.03, r * 0.12, r * 0.15, r * 1.24);
+        sphere.addColorStop(0, data.accent);
+        sphere.addColorStop(0.26, data.color);
+        sphere.addColorStop(0.72, data.color);
+        sphere.addColorStop(1, "#090c17");
+        ctx.fillStyle = sphere;
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetY = 0;
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(0, 0, r * 0.97, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.globalAlpha = 0.3;
+        ctx.strokeStyle = data.accent;
+        if (data.surface === "bands") {
+          for (let i = -2; i <= 2; i += 1) {
+            ctx.lineWidth = Math.max(2, r * (i === 0 ? 0.15 : 0.07));
+            ctx.beginPath();
+            ctx.ellipse(0, i * r * 0.27, r * 1.1, r * 0.19, -0.16, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+        } else if (data.surface === "crater" || data.surface === "rock") {
+          for (let i = 0; i < 4; i += 1) {
+            const angle = i * 2.4 + 0.4;
+            const x = Math.cos(angle) * r * 0.46;
+            const y = Math.sin(angle) * r * 0.46;
+            const size = r * (0.11 + (i % 2) * 0.06);
+            ctx.fillStyle = "#11152255";
+            ctx.beginPath();
+            ctx.arc(x + 1, y + 2, size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = data.accent;
+            ctx.lineWidth = Math.max(1, r * 0.035);
+            ctx.beginPath();
+            ctx.arc(x, y, size, Math.PI * 1.1, Math.PI * 1.92);
+            ctx.stroke();
+          }
+        } else if (data.surface === "continents" || data.surface === "ocean") {
+          ctx.fillStyle = data.accent;
+          for (let i = 0; i < 4; i += 1) {
+            const x = Math.sin(i * 3.1 + 0.6) * r * 0.42;
+            const y = Math.cos(i * 2.2 + 0.8) * r * 0.44;
+            ctx.beginPath();
+            ctx.ellipse(x, y, r * (0.2 + (i % 2) * 0.09), r * 0.1, i * 0.7, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        } else if (data.surface === "pulse" || data.surface === "magnetic") {
+          ctx.lineWidth = Math.max(1, r * 0.025);
+          for (let i = 1; i <= 3; i += 1) {
+            ctx.beginPath();
+            ctx.ellipse(0, 0, r * i * 0.32, r * i * 0.21, -0.5, 0, Math.PI * 2);
+            ctx.stroke();
+          }
+        } else if (data.surface === "star" || data.surface === "glow") {
+          for (let i = 0; i < 8; i += 1) {
+            const angle = i * Math.PI / 4;
+            ctx.lineWidth = r * 0.025;
+            ctx.beginPath();
+            ctx.moveTo(Math.cos(angle) * r * 0.4, Math.sin(angle) * r * 0.4);
+            ctx.lineTo(Math.cos(angle) * r * 0.95, Math.sin(angle) * r * 0.95);
+            ctx.stroke();
+          }
+        } else if (data.surface === "blackhole") {
+          const disk = ctx.createRadialGradient(0, 0, r * 0.2, 0, 0, r * 0.96);
+          disk.addColorStop(0, "#05050a");
+          disk.addColorStop(0.48, "#090910");
+          disk.addColorStop(0.68, data.accent);
+          disk.addColorStop(0.78, "#dd704d");
+          disk.addColorStop(0.91, "#28223e");
+          disk.addColorStop(1, "#090c17");
+          ctx.globalAlpha = 1;
+          ctx.fillStyle = disk;
+          ctx.beginPath();
+          ctx.arc(0, 0, r, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.fillStyle = "#020208";
+          ctx.beginPath();
+          ctx.arc(0, 0, r * 0.43, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (data.surface === "galaxy") {
+          ctx.strokeStyle = data.accent;
+          ctx.lineWidth = Math.max(1.2, r * 0.035);
+          for (let arm = 0; arm < 3; arm += 1) {
+            ctx.beginPath();
+            for (let step = 0; step <= 36; step += 1) {
+              const t = step / 36;
+              const angle = arm * Math.PI * 2 / 3 + t * Math.PI * 2.15;
+              const distance = r * (0.09 + t * 0.7);
+              const x = Math.cos(angle) * distance;
+              const y = Math.sin(angle) * distance * 0.68;
+              if (step === 0) ctx.moveTo(x, y);
+              else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+          }
+          ctx.fillStyle = "#fff6d6";
+          ctx.globalAlpha = 0.9;
+          ctx.beginPath();
+          ctx.arc(0, 0, r * 0.12, 0, Math.PI * 2);
+          ctx.fill();
+        } else if (data.surface === "cluster") {
+          for (let i = 0; i < 46; i += 1) {
+            const angle = i * 2.39996;
+            const distance = r * Math.sqrt((i + 1) / 48) * 0.82;
+            ctx.globalAlpha = 0.45 + (i % 4) * 0.13;
+            ctx.fillStyle = i % 5 === 0 ? data.accent : "#eaf2ff";
+            ctx.beginPath();
+            ctx.arc(Math.cos(angle) * distance, Math.sin(angle) * distance, 0.7 + (i % 3) * 0.35, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        } else {
+          for (let i = 0; i < 18; i += 1) {
+            const x = Math.sin(i * 12.9898) * r * 0.65;
+            const y = Math.cos(i * 4.1414) * r * 0.65;
+            ctx.globalAlpha = 0.5;
+            ctx.fillStyle = i % 3 === 0 ? data.accent : "#ffffff";
+            ctx.beginPath();
+            ctx.arc(x, y, Math.max(0.7, r * 0.025), 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+        ctx.restore();
+
+        if (data.ring) {
+          ctx.save();
+          ctx.rotate(-0.28);
+          ctx.strokeStyle = data.accent + "bb";
+          ctx.lineWidth = Math.max(2, r * 0.14);
+          ctx.beginPath();
+          ctx.ellipse(0, 0, r * 1.42, r * 0.48, 0, 0, Math.PI);
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        ctx.lineWidth = Math.max(1.2, r * 0.025);
+        ctx.strokeStyle = "#ffffff66";
+        ctx.beginPath();
+        ctx.arc(0, 0, r - 0.5, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+
+        if (animal.overLine > 0.25) {
+          ctx.strokeStyle = `rgba(255, 96, 117, ${Math.min(0.8, animal.overLine)})`;
+          ctx.lineWidth = 3;
+          ctx.beginPath();
+          ctx.arc(animal.x, animal.y, animal.r + 3, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+      }
+
+      function draw() {
+        const now = performance.now();
+        if (comboCount > 0 && now - lastMergeAt > 2600) {
+          comboCount = 0;
+          comboStatus.hidden = true;
+        }
+        const elapsed = Math.min((now - lastHueUpdate) / 1000, 0.05);
+        lastHueUpdate = now;
+        const targetHue = (score * 0.06) % 360;
+        const hueDifference = ((targetHue - sceneHue + 540) % 360) - 180;
+        sceneHue = (sceneHue + hueDifference * (1 - Math.exp(-elapsed * 0.65)) + 360) % 360;
+
+        ctx.save();
+        ctx.filter = `hue-rotate(${sceneHue.toFixed(1)}deg)`;
+        drawBackground(now);
+
+        if (active && canDrop && !gameOver) {
+          const radius = radiusOf(currentLevel);
+          ctx.save();
+          ctx.globalAlpha = 0.3;
+          ctx.strokeStyle = "#fff5d7";
+          ctx.shadowColor = "#fff2c2";
+          ctx.shadowBlur = 12;
+          ctx.lineWidth = 2;
+          ctx.setLineDash([5, 6]);
+          ctx.beginPath();
+          ctx.moveTo(dropX, TOP_LINE + radius + 6);
+          ctx.lineTo(dropX, HEIGHT - WALL);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.shadowBlur = 0;
+          ctx.globalAlpha = 0.14;
+          ctx.restore();
+
+          drawAnimal({
+            level: currentLevel,
+            x: dropX,
+            y: TOP_LINE + radius + 6,
+            r: radius,
+            born: performance.now() - 500,
+            wobble: 0,
+            overLine: 0,
+          });
+        }
+
+        for (const animal of animals) drawAnimal(animal);
+        for (const particle of particles) {
+          const alpha = Math.max(0, particle.life / particle.maxLife);
+          ctx.save();
+          ctx.globalAlpha = alpha;
+          ctx.fillStyle = particle.color;
+          ctx.shadowColor = particle.color;
+          ctx.shadowBlur = 9;
+          if (particle.star) {
+            ctx.translate(particle.x, particle.y);
+            ctx.rotate((1 - alpha) * Math.PI);
+            ctx.fillRect(-particle.size / 2, -particle.size / 2, particle.size, particle.size);
+            ctx.fillRect(-particle.size * 1.5, -particle.size * 0.28, particle.size * 3, particle.size * 0.56);
+          } else {
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, particle.size * alpha, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          ctx.restore();
+        }
+        for (const burst of scoreBursts) {
+          ctx.save();
+          ctx.globalAlpha = Math.min(1, burst.life * 2);
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.font = "1000 19px system-ui, sans-serif";
+          ctx.lineWidth = 4;
+          ctx.strokeStyle = "#26334f";
+          ctx.strokeText(burst.text, burst.x, burst.y);
+          ctx.fillStyle = "#fff2a8";
+          ctx.shadowColor = "#ffc86c";
+          ctx.shadowBlur = 15;
+          ctx.fillText(burst.text, burst.x, burst.y);
+          ctx.restore();
+        }
+        if (flash > 0) {
+          ctx.fillStyle = `rgba(255, 225, 147, ${flash * 0.5})`;
+          ctx.fillRect(WALL, TOP_LINE, WIDTH - WALL * 2, HEIGHT - TOP_LINE);
+        }
+        ctx.restore();
+      }
+
+      function frame(now) {
+        if (active) {
+          if (!lastFrame) lastFrame = now;
+          accumulator += Math.min((now - lastFrame) / 1000, 0.05);
+          lastFrame = now;
+          const fixedStep = 1 / 120;
+          while (accumulator >= fixedStep && !gameOver) {
+            step(fixedStep, now);
+            accumulator -= fixedStep;
+          }
+        }
+        draw();
+        requestAnimationFrame(frame);
+      }
+
+      function endGame() {
+        if (gameOver) return;
+        gameOver = true;
+        active = false;
+        const isNewRecord = score > bestScore;
+        if (isNewRecord) {
+          bestScore = score;
+          bestScoreNode.textContent = String(bestScore);
+          try { localStorage.setItem(BEST_SCORE_KEY, String(bestScore)); } catch (error) {}
+        }
+        const duration = Math.max(0, Math.floor((performance.now() - runStartedAt) / 1000));
+        const durationText = `${Math.floor(duration / 60)}:${String(duration % 60).padStart(2, "0")}`;
+        overlayTitle.textContent = isNewRecord ? "Yeni Rekor!" : "Oyun bitti!";
+        overlayText.textContent = `Skor: ${score} · Rekor: ${bestScore} · Süre: ${durationText}`;
+        brandMark.classList.toggle("record-break", isNewRecord);
+        startButton.textContent = "Yeni sefer";
+        startButton.hidden = false;
+        scoreForm.hidden = true;
+        scoreSubmitStatus.textContent = leaderboardConfigured
+          ? `@${playerName || "oyuncu"} için skor gönderiliyor…`
+          : `Yerel oyun tamamlandı. Skor: ${score}. Çevrim içi kayıt için Supabase bağlantısı gerekli.`;
+        overlay.hidden = false;
+        playTone(isNewRecord ? 880 : 260, isNewRecord ? 0.55 : 0.32, isNewRecord ? "sine" : "triangle", 0.045);
+        draw();
+        if (leaderboardConfigured && playerName) void submitLeaderboardScore();
+        startButton.focus();
+      }
+
+      function startGame() {
+        animals = [];
+        particles = [];
+        scoreBursts = [];
+        score = 0;
+        comboCount = 0;
+        lastMergeAt = -Infinity;
+        comboStatus.hidden = true;
+        brandMark.classList.remove("record-break");
+        runStartedAt = performance.now();
+        currentLevel = randomLevel();
+        nextLevel = randomLevel();
+        next2Level = randomLevel();
+        updateNext();
+        dropX = WIDTH / 2;
+        canDrop = true;
+        gameOver = false;
+        active = true;
+        scoreForm.hidden = true;
+        startButton.hidden = true;
+        scoreSubmitStatus.textContent = "";
+        lastFrame = 0;
+        accumulator = 0;
+        updateScore();
+        overlay.hidden = true;
+        draw();
+        canvas.focus({ preventScroll: true });
+      }
+
+      canvas.addEventListener("pointermove", event => {
+        if (!active || gameOver) return;
+        setDropX(pointerX(event));
+        draw();
+      });
+
+      canvas.addEventListener("pointerdown", event => {
+        if (!active || gameOver || event.button !== 0) return;
+        event.preventDefault();
+        setDropX(pointerX(event));
+        dropAnimal();
+        draw();
+      });
+
+      window.addEventListener("keydown", event => {
+        if (!active || gameOver) return;
+        if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") {
+          event.preventDefault();
+          setDropX(dropX - 24);
+          draw();
+        } else if (event.key === "ArrowRight" || event.key.toLowerCase() === "d") {
+          event.preventDefault();
+          setDropX(dropX + 24);
+          draw();
+        } else if (event.code === "Space" || event.key === "ArrowDown") {
+          event.preventDefault();
+          dropAnimal();
+          draw();
+        }
+      });
+
+      startButton.textContent = "Yeni sefer";
+      startButton.addEventListener("click", startGame);
+      scoreForm.addEventListener("submit", registerPlayerAndStart);
+      playerNameInput.addEventListener("input", () => playerNameInput.setCustomValidity(""));
+      refreshScoresButton.addEventListener("click", loadLeaderboard);
+      soundToggle.addEventListener("click", toggleSound);
+      if (typeof window.AudioContext !== "function") {
+        soundToggle.disabled = true;
+        soundToggle.textContent = "Ses desteklenmiyor";
+      }
+      try {
+        const savedBest = Number(localStorage.getItem(BEST_SCORE_KEY));
+        if (Number.isFinite(savedBest) && savedBest > 0) bestScore = savedBest;
+        bestScoreNode.textContent = String(bestScore);
+        soundEnabled = localStorage.getItem(SOUND_ENABLED_KEY) === "true" && typeof window.AudioContext === "function";
+        updateSoundButton();
+        const savedName = localStorage.getItem(PLAYER_NAME_KEY);
+        if (savedName && /^[A-Za-z0-9_]{3,18}$/.test(savedName)) {
+          playerName = savedName;
+          playerNameInput.value = savedName;
+          scoreSubmitStatus.textContent = leaderboardConfigured
+            ? `Kayıtlı oyuncu: @${savedName}. Devam etmek için kullanıcı adını doğrula.`
+            : `Yerel oyuncu: @${savedName}. Bu ad çevrim içi ayrılmadı; çevrim içi skor tablosu kullanılamıyor.`;
+        } else {
+          scoreSubmitStatus.textContent = leaderboardConfigured
+            ? "Kullanıcı adın bu tarayıcıdaki oyuncu hesabına bağlanır; tarayıcı verilerini temizlersen hesap kurtarılamaz."
+            : "Supabase bağlı değil; yerel oynayabilirsin ancak kullanıcı adın ayrılmaz ve skorun çevrim içi kaydedilmez.";
+        }
+      } catch (error) {}
+      if (!leaderboardConfigured) submitScoreButton.textContent = "Adınla yerel oyna";
+      updateNext();
+      loadLeaderboard();
+      draw();
+      requestAnimationFrame(frame);
+    })();
+  </script>
+</body>
+</html>
