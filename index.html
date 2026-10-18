@@ -3,13 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#080c18">
+  <meta name="theme-color" content="#090626">
+  <link rel="icon" href="assets/cosmic-cat.jpeg" type="image/jpeg">
   <title>Kozmik Birleştirme</title>
   <style>
     :root {
       color-scheme: dark;
       font-family: "Segoe UI", Inter, system-ui, sans-serif;
-      background: #080c18;
+      background: #090626;
       color: #eef2ff;
       font-synthesis: none;
     }
@@ -21,9 +22,9 @@
       padding: max(14px, env(safe-area-inset-top)) 14px max(14px, env(safe-area-inset-bottom));
       overflow-x: clip;
       background:
-        radial-gradient(ellipse at 14% 8%, #1e31503d 0, transparent 36%),
-        radial-gradient(ellipse at 90% 86%, #58386630 0, transparent 34%),
-        #080c18;
+        radial-gradient(ellipse at 14% 8%, #2858ff42 0, transparent 38%),
+        radial-gradient(ellipse at 90% 86%, #c22cdb38 0, transparent 36%),
+        #090626;
     }
     .layout {
       width: min(100%, 510px);
@@ -68,9 +69,9 @@
       gap: 14px;
       min-width: 130px;
       padding: 8px 14px;
-      border: 1px solid #d5bb7b38;
+      border: 1px solid #9d7aff60;
       border-radius: 15px;
-      background: linear-gradient(145deg, #d3b56e17, #ffffff08);
+      background: linear-gradient(145deg, #593dcc55, #22164999);
       text-align: right;
       box-shadow: 0 8px 26px #05081380, inset 0 1px #ffffff18;
     }
@@ -89,8 +90,8 @@
       font-weight: 900;
       font-variant-numeric: tabular-nums;
       line-height: 1;
-      color: #e7cb83;
-      text-shadow: 0 0 18px #c5a24a45;
+      color: #ffe17b;
+      text-shadow: 0 0 18px #ffca5e70;
     }
     .best-label {
       display: block;
@@ -102,7 +103,7 @@
     #bestScore {
       display: block;
       margin-top: 3px;
-      color: #c7d3e8;
+      color: #d6ccff;
       font-size: .95rem;
       font-weight: 850;
       font-variant-numeric: tabular-nums;
@@ -110,10 +111,10 @@
     .board-frame {
       position: relative;
       overflow: hidden;
-      border: 1px solid #b7c6e229;
+      border: 1px solid #9b79ff59;
       border-radius: 18px;
-      background: #090e1b;
-      box-shadow: 0 22px 64px #02040bba, 0 0 34px #93a9e50c, inset 0 1px #ffffff20;
+      background: #090626;
+      box-shadow: 0 22px 64px #02040bba, 0 0 34px #9e43ff24, inset 0 1px #ffffff20;
       touch-action: none;
     }
     .board-controls {
@@ -131,11 +132,11 @@
     .board-control {
       min-height: 44px;
       padding: 9px 15px;
-      border: 1px solid #ffffff35;
+      border: 1px solid #ffffff75;
       border-radius: 14px;
       color: #111827;
-      background: linear-gradient(145deg, #ffe9a5, #ddb85c);
-      box-shadow: 0 5px 18px #d6b85a45, inset 0 1px #fff9dc;
+      background: linear-gradient(145deg, #fff1a7, #ffc64f);
+      box-shadow: 0 5px 20px #ffc64f65, inset 0 1px #fff9dc;
       backdrop-filter: blur(8px);
       font: inherit;
       font-size: .8rem;
@@ -182,11 +183,14 @@
     }
     .overlay {
       position: absolute;
+      z-index: 3;
       inset: 0;
       display: grid;
       place-items: center;
       padding: 22px;
-      background: #070a13d9;
+      background:
+        linear-gradient(180deg, #09062655 0%, #090626ba 48%, #090626f2 100%),
+        url("assets/cosmic-merge-cover.jpeg") center 34% / cover;
       backdrop-filter: blur(9px);
       text-align: center;
     }
@@ -194,10 +198,10 @@
     .dialog {
       width: min(100%, 330px);
       padding: 25px 22px;
-      border: 1px solid #c3d3f022;
+      border: 1px solid #9f7aff80;
       border-radius: 19px;
-      background: linear-gradient(145deg, #1b2436, #111725);
-      box-shadow: 0 16px 45px #02040b99, inset 0 1px #ffffff14;
+      background: linear-gradient(145deg, #10173ee8, #130c35ed);
+      box-shadow: 0 16px 45px #02040bcc, 0 0 32px #8959ff3b, inset 0 1px #ffffff22;
     }
     .brand-mark {
       display: grid;
@@ -205,11 +209,11 @@
       height: 54px;
       place-items: center;
       margin: 0 auto 13px;
-      border: 1px solid #d6bf7b54;
+      border: 1px solid #c69bff8a;
       border-radius: 50%;
-      color: #e4cc8c;
-      background: radial-gradient(circle at 35% 30%, #c9a95a38, #101725 70%);
-      box-shadow: 0 0 28px #dfc27524;
+      color: #ffe08a;
+      background: radial-gradient(circle at 35% 30%, #b46bff65, #10113c 70%);
+      box-shadow: 0 0 28px #b777ff55;
       font-size: 1.55rem;
     }
     .brand-mark.record-break {
@@ -226,9 +230,9 @@
       padding: 11px 21px;
       border: 0;
       border-radius: 14px;
-      color: #171715;
-      background: linear-gradient(135deg, #e3d09b, #bca36a);
-      box-shadow: 0 4px 0 #817047;
+      color: #16103b;
+      background: linear-gradient(135deg, #ffe36e, #ff9b4a);
+      box-shadow: 0 4px 0 #9b4e73, 0 0 18px #ffbf5270;
       font: inherit;
       font-weight: 900;
       cursor: pointer;
@@ -236,7 +240,7 @@
     }
     .button:hover { transform: translateY(-1px); }
     .button:active { transform: translateY(3px); box-shadow: 0 1px 0 #817047; }
-    .button:focus-visible {     outline: 3px solid #e9d79e; outline-offset: 4px; }
+    .button:focus-visible {         outline: 3px solid #f4c8ff; outline-offset: 4px; }
     .instructions {
       display: flex;
       flex-wrap: wrap;
@@ -253,14 +257,14 @@
       align-items: center;
       gap: 6px;
       padding: 5px 10px 5px 7px;
-      border: 1px solid #b7c6e21c;
+      border: 1px solid #a286ff50;
       border-radius: 12px;
-      background: linear-gradient(135deg, #a8b9df0e, #ffffff05);
-      box-shadow: 0 5px 18px #03071155;
+      background: linear-gradient(135deg, #48348a55, #1b163d99);
+      box-shadow: 0 5px 18px #03071177;
     }
     .queue-piece { display: inline-flex; align-items: center; gap: 4px; }
     .queue-index { color: #8491a8; font-size: .58rem; font-weight: 850; }
-    .next-name { color: #e0cc94; font-size: .68rem; font-weight: 750; }
+    .next-name { color: #d7c2ff; font-size: .68rem; font-weight: 750; }
     .next-divider { color: #66738b; }
     .next-orb {
       width: 15px;
@@ -278,11 +282,11 @@
       margin: 5px 3px 0;
     }
     .combo-status {
-      color: #e9d28e;
+      color: #ffdf76;
       font-size: .72rem;
       font-weight: 900;
       letter-spacing: .06em;
-      text-shadow: 0 0 12px #e9bd5c55;
+      text-shadow: 0 0 12px #b869ff88;
     }
     .combo-status[hidden] { display: none; }
     .toolbar-actions { display: inline-flex; gap: 6px; }
@@ -290,8 +294,8 @@
       padding: 5px 9px;
       border: 1px solid #ffffff1a;
       border-radius: 8px;
-      color: #c7d3e8;
-      background: #ffffff08;
+      color: #e5dcff;
+      background: linear-gradient(145deg, #5335a9, #302166);
       font: inherit;
       font-size: .66rem;
       cursor: pointer;
@@ -299,10 +303,10 @@
     .leaderboard-toggle:focus-visible { outline: 2px solid #cfb577; outline-offset: 2px; }
     .shuffle-button {
       padding: 5px 9px;
-      border: 1px solid #b8a36c55;
+      border: 1px solid #c59bff70;
       border-radius: 8px;
-      color: #e6d197;
-      background: #d8b96b12;
+      color: #ffe58c;
+      background: linear-gradient(145deg, #5737ab, #301d70);
       font: inherit;
       font-size: .66rem;
       cursor: pointer;
@@ -310,10 +314,10 @@
     .board-control.shuffle-button {
       min-height: 44px;
       padding: 9px 14px;
-      border-color: #bcffff9c;
-      color: #07333b;
-      background: linear-gradient(145deg, #9af4e5, #55cbbd);
-      box-shadow: 0 5px 20px #50d7c346, inset 0 1px #e6fffc;
+      border-color: #c3a2ffb8;
+      color: #fff;
+      background: linear-gradient(145deg, #a775ff, #6c49ed);
+      box-shadow: 0 5px 20px #8b5cf65e, inset 0 1px #ffffff55;
       font-size: .78rem;
     }
     .board-control.shuffle-button::before {
@@ -322,7 +326,7 @@
       font-size: .9rem;
     }
     .board-control.shuffle-button:hover:not(:disabled) {
-      box-shadow: 0 8px 25px #50d7c370, inset 0 1px #e6fffc;
+      box-shadow: 0 8px 25px #8b5cf680, inset 0 1px #ffffff66;
     }
     .shuffle-button:disabled { opacity: .45; cursor: not-allowed; }
     .shuffle-button:focus-visible { outline: 2px solid #cfb577; outline-offset: 2px; }
@@ -335,16 +339,16 @@
       overflow-x: auto;
       margin: 10px 2px 0;
       padding: 8px 9px;
-      border: 1px solid #ffffff13;
+      border: 1px solid #8d6af145;
       border-radius: 13px;
-      background: #ffffff05;
+      background: linear-gradient(120deg, #211548a8, #35174873);
       scrollbar-width: thin;
       scrollbar-color: #7486a755 transparent;
     }
     .evolution-label {
       flex: 0 0 auto;
       margin-right: 4px;
-      color: #8995aa;
+      color: #c2a9ff;
       font-size: .63rem;
       font-weight: 850;
       letter-spacing: .08em;
@@ -353,22 +357,22 @@
     .evolution-animal {
       flex: 0 0 auto;
       padding: 4px 7px;
-      border: 1px solid #ffffff12;
+      border: 1px solid #a981ff35;
       border-radius: 7px;
-      color: #b9c5d9;
-      background: #ffffff06;
+      color: #e5d9ff;
+      background: linear-gradient(145deg, #342163, #20163e);
       font-size: .62rem;
       font-weight: 700;
     }
-    .evolution-arrow { flex: 0 0 auto; color: #aa9461; font-size: .7rem; }
+    .evolution-arrow { flex: 0 0 auto; color: #ffca68; font-size: .7rem; }
     .leaderboard {
       width: 100%;
       max-height: min(78svh, 620px);
       overflow-y: auto;
       padding: 14px 15px;
-      border: 1px solid #c1cee018;
+      border: 1px solid #a080ff55;
       border-radius: 14px;
-      background: linear-gradient(140deg, #ffffff08, #ffffff03);
+      background: linear-gradient(140deg, #201640f2, #100d2bf5);
     }
     .leaderboard-overlay {
       position: fixed;
@@ -404,11 +408,11 @@
       padding: 24px 22px;
       border: 1px solid #c3d3f022;
       border-radius: 19px;
-      background: linear-gradient(145deg, #1b2436, #111725);
+      background: linear-gradient(145deg, #17134beF, #100b32f2);
       box-shadow: 0 16px 45px #02040b99, inset 0 1px #ffffff14;
       text-align: center;
     }
-    .game-menu-dialog h2 { margin: 0 0 5px; font-size: 1.5rem; }
+    .game-menu-dialog h2 { margin: 0 0 5px; color: #f2eaff; font-size: 1.5rem; }
     .game-menu-dialog .button { width: 100%; }
     .menu-secondary {
       min-height: 42px;
@@ -558,7 +562,7 @@
       </div>
       <section class="overlay" id="overlay" aria-labelledby="overlayTitle">
         <div class="dialog">
-          <div class="brand-mark" aria-hidden="true">✦</div>
+          <div class="brand-mark" aria-hidden="true">🐱</div>
           <h2 id="overlayTitle">Yörüngeye gir</h2>
           <p id="overlayText">Gök cisimlerini bırak, eşleşenleri birleştir ve yıldız sistemini büyüt. Kütleyi kritik çizginin altında tut.</p>
           <form class="score-form" id="scoreForm">
@@ -692,27 +696,29 @@
       backgroundCanvas.width = WIDTH;
       backgroundCanvas.height = HEIGHT;
       const backgroundCtx = backgroundCanvas.getContext("2d");
+      const catSprite = new Image();
+      catSprite.src = "assets/cosmic-cat.jpeg";
       let shootingStars = [];
       let nextShootingStarAt = performance.now() + 4000 + Math.random() * 5000;
       const ANIMALS = [
-        { name: "Toz", radius: 13, color: "#aaa0c1", accent: "#c5bbdc", surface: "dust" },
-        { name: "Kaya", radius: 15, color: "#a66f66", accent: "#e3a07a", surface: "rock" },
-        { name: "Ay", radius: 18, color: "#a4aab3", accent: "#e1e2d9", surface: "crater" },
-        { name: "Gezegen", radius: 21, color: "#3e82a1", accent: "#82d3d1", surface: "ocean" },
-        { name: "Halkalı", radius: 25, color: "#c39a61", accent: "#f0d99c", surface: "bands", ring: true },
-        { name: "Gaz devi", radius: 30, color: "#b9785e", accent: "#e7b47a", surface: "bands" },
-        { name: "Buz devi", radius: 35, color: "#477eaa", accent: "#8ad6e5", surface: "bands", ring: true },
-        { name: "Süper dünya", radius: 41, color: "#4c8c79", accent: "#c6c27a", surface: "continents" },
-        { name: "Cüce yıldız", radius: 48, color: "#a95e39", accent: "#f1b467", surface: "glow" },
-        { name: "Yıldız", radius: 56, color: "#d79a4d", accent: "#fff0b0", surface: "star", glow: true },
-        { name: "Nötron", radius: 65, color: "#6c79be", accent: "#b7c6ff", surface: "pulse", glow: true },
-        { name: "Pulsar", radius: 74, color: "#5d89b1", accent: "#c3e5ff", surface: "pulse", ring: true, glow: true },
-        { name: "Magnetar", radius: 83, color: "#9863b3", accent: "#f0b4ff", surface: "magnetic", ring: true, glow: true },
-        { name: "Kara delik", radius: 92, color: "#17131f", accent: "#f1c879", surface: "blackhole", ring: true, glow: true },
-        { name: "Quasar", radius: 101, color: "#5c6ea8", accent: "#eac57a", surface: "magnetic", ring: true, glow: true },
-        { name: "Bulutsu", radius: 110, color: "#6f4a8e", accent: "#d8a3ee", surface: "glow", ring: true, glow: true },
-        { name: "Yıldız kümesi", radius: 119, color: "#405f83", accent: "#e8d59d", surface: "cluster", ring: true, glow: true },
-        { name: "Galaksi çekirdeği", radius: 128, color: "#6e456f", accent: "#ffe0a0", surface: "galaxy", ring: true, glow: true },
+        { name: "Toz", radius: 13, color: "#b8a1ff", accent: "#f0ddff", surface: "dust" },
+        { name: "Kaya", radius: 15, color: "#e97d9e", accent: "#ffc2cc", surface: "rock" },
+        { name: "Ay", radius: 18, color: "#9da9e8", accent: "#e3e9ff", surface: "crater" },
+        { name: "Gezegen", radius: 21, color: "#2877ed", accent: "#75efff", surface: "ocean" },
+        { name: "Halkalı", radius: 25, color: "#eea34b", accent: "#ffe99a", surface: "bands", ring: true },
+        { name: "Gaz devi", radius: 30, color: "#ed7182", accent: "#ffd0aa", surface: "bands" },
+        { name: "Buz devi", radius: 35, color: "#36b9e7", accent: "#b9f7ff", surface: "bands", ring: true },
+        { name: "Süper dünya", radius: 41, color: "#42b89e", accent: "#b7ffbb", surface: "continents" },
+        { name: "Cüce yıldız", radius: 48, color: "#e65d9f", accent: "#ffb5eb", surface: "glow" },
+        { name: "Yıldız", radius: 56, color: "#f0a743", accent: "#fff3ae", surface: "star", glow: true },
+        { name: "Nötron", radius: 65, color: "#565bdb", accent: "#c2c4ff", surface: "pulse", glow: true },
+        { name: "Pulsar", radius: 74, color: "#367ddd", accent: "#a8f2ff", surface: "pulse", ring: true, glow: true },
+        { name: "Magnetar", radius: 83, color: "#a249e0", accent: "#f0b4ff", surface: "magnetic", ring: true, glow: true },
+        { name: "Kara delik", radius: 92, color: "#21153d", accent: "#ffda72", surface: "blackhole", ring: true, glow: true },
+        { name: "Quasar", radius: 101, color: "#6454e8", accent: "#ffe07e", surface: "magnetic", ring: true, glow: true },
+        { name: "Bulutsu", radius: 110, color: "#9549d5", accent: "#efb3ff", surface: "glow", ring: true, glow: true },
+        { name: "Yıldız kümesi", radius: 119, color: "#3779bb", accent: "#ffe899", surface: "cluster", ring: true, glow: true },
+        { name: "Galaksi çekirdeği", radius: 128, color: "#bb4fd4", accent: "#ffe0ff", surface: "galaxy", ring: true, glow: true },
       ];
       const DIFFICULTY = {
         maxDropLevel: 4,
@@ -962,6 +968,7 @@
       let currentLevel = 0;
       let nextLevel = 0;
       let next2Level = 0;
+      let catThrowAt = -Infinity;
       let dropX = WIDTH / 2;
       let aimingPointerId = null;
       let canDrop = true;
@@ -1044,7 +1051,7 @@
         playerNameInput.focus();
       }
 
-      function playTone(frequency, duration, type, volume) {
+      function playCatMeow(frequency, duration, volume) {
         if (!soundEnabled) return;
         try {
           if (!audioContext) audioContext = new window.AudioContext();
@@ -1055,18 +1062,27 @@
               scoreSubmitStatus.textContent = "Ses başlatılamadı; tekrar açmak için ses düğmesine bas.";
             });
           }
-          const oscillator = audioContext.createOscillator();
-          const gain = audioContext.createGain();
           const startAt = audioContext.currentTime;
-          oscillator.type = type;
-          oscillator.frequency.setValueAtTime(frequency, startAt);
-          oscillator.frequency.exponentialRampToValueAtTime(Math.max(45, frequency * 0.72), startAt + duration);
-          gain.gain.setValueAtTime(volume, startAt);
-          gain.gain.exponentialRampToValueAtTime(0.001, startAt + duration);
-          oscillator.connect(gain);
+          const meowDuration = Math.max(0.2, duration);
+          const oscillator = audioContext.createOscillator();
+          const formant = audioContext.createBiquadFilter();
+          const gain = audioContext.createGain();
+          oscillator.type = "sawtooth";
+          oscillator.frequency.setValueAtTime(Math.max(280, frequency * 0.78), startAt);
+          oscillator.frequency.exponentialRampToValueAtTime(frequency * 1.35, startAt + meowDuration * 0.28);
+          oscillator.frequency.exponentialRampToValueAtTime(Math.max(180, frequency * 0.56), startAt + meowDuration);
+          formant.type = "bandpass";
+          formant.frequency.setValueAtTime(920, startAt);
+          formant.Q.setValueAtTime(1.25, startAt);
+          gain.gain.setValueAtTime(0.001, startAt);
+          gain.gain.linearRampToValueAtTime(volume, startAt + 0.035);
+          gain.gain.setValueAtTime(volume * 0.72, startAt + meowDuration * 0.36);
+          gain.gain.exponentialRampToValueAtTime(0.001, startAt + meowDuration);
+          oscillator.connect(formant);
+          formant.connect(gain);
           gain.connect(audioContext.destination);
           oscillator.start(startAt);
-          oscillator.stop(startAt + duration);
+          oscillator.stop(startAt + meowDuration);
         } catch (error) {
           soundEnabled = false;
           updateSoundButton();
@@ -1078,7 +1094,7 @@
         soundEnabled = !soundEnabled;
         updateSoundButton();
         try { localStorage.setItem(SOUND_ENABLED_KEY, String(soundEnabled)); } catch (error) {}
-        if (soundEnabled) playTone(740, 0.11, "sine", 0.04);
+        if (soundEnabled) playCatMeow(720, 0.2, 0.035);
       }
 
       function setDropX(x) {
@@ -1122,7 +1138,8 @@
 
       function dropAnimal() {
         if (!active || gameOver || !canDrop) return;
-        playTone(420 + currentLevel * 38, 0.08, "triangle", 0.025);
+        catThrowAt = performance.now();
+        playCatMeow(430 + currentLevel * 34, 0.22, 0.025);
         const radius = radiusOf(currentLevel);
         setDropX(dropX);
         addAnimal(
@@ -1167,7 +1184,7 @@
         makeMergeEffects(x, y, points);
         comboStatus.hidden = comboCount < 2;
         if (comboCount > 1) comboStatus.textContent = `KOMBO x${comboCount} · +${comboBonus}`;
-        playTone(620 + Math.min(comboCount, 6) * 75, 0.18, comboCount > 1 ? "sawtooth" : "sine", comboCount > 1 ? 0.05 : 0.035);
+        playCatMeow(610 + Math.min(comboCount, 6) * 65, 0.32, comboCount > 1 ? 0.045 : 0.032);
         updateScore();
         flash = 0.13;
         updateShuffleButton();
@@ -1236,8 +1253,8 @@
         comboStatus.hidden = false;
         shuffleUsed = true;
         updateShuffleButton();
-        playTone(360, 0.18, "triangle", 0.04);
-        window.setTimeout(() => playTone(540, 0.2, "sine", 0.035), 110);
+        playCatMeow(380, 0.26, 0.035);
+        window.setTimeout(() => playCatMeow(620, 0.28, 0.032), 170);
         draw();
       }
 
@@ -1357,32 +1374,32 @@
       function drawStaticBackground() {
         const staticCtx = backgroundCtx;
         const sky = staticCtx.createLinearGradient(0, 0, 0, HEIGHT);
-        sky.addColorStop(0, "#080c18");
-        sky.addColorStop(0.5, "#101526");
-        sky.addColorStop(1, "#171627");
+        sky.addColorStop(0, "#080a32");
+        sky.addColorStop(0.48, "#14104a");
+        sky.addColorStop(1, "#26133e");
         staticCtx.fillStyle = sky;
         staticCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
         const nebulae = [
-          { x: 99, y: 291, r: 184, color: "#4d3970" },
-          { x: 368, y: 435, r: 206, color: "#254d69" },
-          { x: 217, y: 563, r: 165, color: "#553455" },
+          { x: 99, y: 291, r: 184, color: "#6138df" },
+          { x: 368, y: 435, r: 206, color: "#145db2" },
+          { x: 217, y: 563, r: 165, color: "#a32e99" },
         ];
         for (const nebula of nebulae) {
           const haze = staticCtx.createRadialGradient(nebula.x, nebula.y, 0, nebula.x, nebula.y, nebula.r);
-          haze.addColorStop(0, nebula.color + "42");
+          haze.addColorStop(0, nebula.color + "55");
           haze.addColorStop(1, nebula.color + "00");
           staticCtx.fillStyle = haze;
           staticCtx.fillRect(nebula.x - nebula.r, nebula.y - nebula.r, nebula.r * 2, nebula.r * 2);
         }
 
         const floor = staticCtx.createLinearGradient(0, HEIGHT - 35, 0, HEIGHT);
-        floor.addColorStop(0, "#25263a");
-        floor.addColorStop(1, "#131522");
+        floor.addColorStop(0, "#38225e");
+        floor.addColorStop(1, "#17143c");
         staticCtx.fillStyle = floor;
         staticCtx.fillRect(0, HEIGHT - WALL, WIDTH, WALL);
 
-        staticCtx.fillStyle = "#111522";
+        staticCtx.fillStyle = "#15113c";
         staticCtx.fillRect(0, 0, WALL, HEIGHT);
         staticCtx.fillRect(WIDTH - WALL, 0, WALL, HEIGHT);
         staticCtx.fillStyle = "#ffffff0e";
@@ -1392,8 +1409,8 @@
         staticCtx.save();
         staticCtx.setLineDash([5, 8]);
         staticCtx.lineWidth = 1.5;
-        staticCtx.strokeStyle = "#d1aa70";
-        staticCtx.shadowColor = "#dab978";
+        staticCtx.strokeStyle = "#ffd77b";
+        staticCtx.shadowColor = "#bc70ff";
         staticCtx.shadowBlur = 8;
         staticCtx.globalAlpha = 0.8;
         staticCtx.beginPath();
@@ -1402,8 +1419,8 @@
         staticCtx.stroke();
         staticCtx.restore();
 
-        staticCtx.fillStyle = "#dec58e";
-        staticCtx.shadowColor = "#dab978";
+        staticCtx.fillStyle = "#ffe59a";
+        staticCtx.shadowColor = "#bc70ff";
         staticCtx.shadowBlur = 7;
         staticCtx.font = "750 9px system-ui, sans-serif";
         staticCtx.textAlign = "left";
@@ -1506,7 +1523,7 @@
         sphere.addColorStop(0, data.accent);
         sphere.addColorStop(0.26, data.color);
         sphere.addColorStop(0.72, data.color);
-        sphere.addColorStop(1, "#090c17");
+        sphere.addColorStop(1, "#080a32");
         ctx.fillStyle = sphere;
         ctx.beginPath();
         ctx.arc(0, 0, r, 0, Math.PI * 2);
@@ -1675,6 +1692,19 @@
           ctx.fillRect(0, 0, WIDTH, HEIGHT);
         }
 
+        if (active && catSprite.complete && catSprite.naturalWidth > 0) {
+          const throwProgress = Math.min(1, (now - catThrowAt) / 260);
+          const throwBounce = throwProgress < 1 ? Math.sin(throwProgress * Math.PI) * 5 : 0;
+          ctx.save();
+          ctx.globalAlpha = 0.98;
+          ctx.shadowColor = "#a86bff";
+          ctx.shadowBlur = 14;
+          ctx.translate(dropX, TOP_LINE - 33 - throwBounce);
+          ctx.rotate(throwProgress < 1 ? -Math.sin(throwProgress * Math.PI) * 0.055 : 0);
+          ctx.drawImage(catSprite, -38, -33, 76, 66);
+          ctx.restore();
+        }
+
         if (active && canDrop && !gameOver) {
           const radius = radiusOf(currentLevel);
           ctx.save();
@@ -1787,7 +1817,7 @@
           ? `@${playerName || "oyuncu"} için skor gönderiliyor…`
           : `Yerel oyun tamamlandı. Skor: ${score}. Çevrim içi kayıt için Supabase bağlantısı gerekli.`;
         overlay.hidden = false;
-        playTone(isNewRecord ? 880 : 260, isNewRecord ? 0.55 : 0.32, isNewRecord ? "sine" : "triangle", 0.045);
+        playCatMeow(isNewRecord ? 850 : 340, isNewRecord ? 0.48 : 0.32, 0.038);
         draw();
         if (leaderboardConfigured && playerName) void submitLeaderboardScore();
         startButton.focus();
