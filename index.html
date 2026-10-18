@@ -688,6 +688,10 @@
         phase: i * 2.39996,
         speed: 0.7 + (i % 5) * 0.22,
       }));
+      const backgroundCanvas = document.createElement("canvas");
+      backgroundCanvas.width = WIDTH;
+      backgroundCanvas.height = HEIGHT;
+      const backgroundCtx = backgroundCanvas.getContext("2d");
       let shootingStars = [];
       let nextShootingStarAt = performance.now() + 4000 + Math.random() * 5000;
       const ANIMALS = [
@@ -1348,13 +1352,14 @@
         nextOrb2.style.boxShadow = `0 0 12px ${following.accent}55`;
       }
 
-      function drawBackground(now) {
-        const sky = ctx.createLinearGradient(0, 0, 0, HEIGHT);
+      function drawStaticBackground() {
+        const staticCtx = backgroundCtx;
+        const sky = staticCtx.createLinearGradient(0, 0, 0, HEIGHT);
         sky.addColorStop(0, "#080c18");
         sky.addColorStop(0.5, "#101526");
         sky.addColorStop(1, "#171627");
-        ctx.fillStyle = sky;
-        ctx.fillRect(0, 0, WIDTH, HEIGHT);
+        staticCtx.fillStyle = sky;
+        staticCtx.fillRect(0, 0, WIDTH, HEIGHT);
 
         const nebulae = [
           { x: 99, y: 291, r: 184, color: "#4d3970" },
@@ -1362,25 +1367,58 @@
           { x: 217, y: 563, r: 165, color: "#553455" },
         ];
         for (const nebula of nebulae) {
-          const haze = ctx.createRadialGradient(nebula.x, nebula.y, 0, nebula.x, nebula.y, nebula.r);
+          const haze = staticCtx.createRadialGradient(nebula.x, nebula.y, 0, nebula.x, nebula.y, nebula.r);
           haze.addColorStop(0, nebula.color + "42");
           haze.addColorStop(1, nebula.color + "00");
-          ctx.fillStyle = haze;
-          ctx.fillRect(nebula.x - nebula.r, nebula.y - nebula.r, nebula.r * 2, nebula.r * 2);
+          staticCtx.fillStyle = haze;
+          staticCtx.fillRect(nebula.x - nebula.r, nebula.y - nebula.r, nebula.r * 2, nebula.r * 2);
         }
 
+        const floor = staticCtx.createLinearGradient(0, HEIGHT - 35, 0, HEIGHT);
+        floor.addColorStop(0, "#25263a");
+        floor.addColorStop(1, "#131522");
+        staticCtx.fillStyle = floor;
+        staticCtx.fillRect(0, HEIGHT - WALL, WIDTH, WALL);
+
+        staticCtx.fillStyle = "#111522";
+        staticCtx.fillRect(0, 0, WALL, HEIGHT);
+        staticCtx.fillRect(WIDTH - WALL, 0, WALL, HEIGHT);
+        staticCtx.fillStyle = "#ffffff0e";
+        staticCtx.fillRect(WALL, 0, 2, HEIGHT);
+        staticCtx.fillRect(WIDTH - WALL - 2, 0, 2, HEIGHT);
+
+        staticCtx.save();
+        staticCtx.setLineDash([5, 8]);
+        staticCtx.lineWidth = 1.5;
+        staticCtx.strokeStyle = "#d1aa70";
+        staticCtx.shadowColor = "#dab978";
+        staticCtx.shadowBlur = 8;
+        staticCtx.globalAlpha = 0.8;
+        staticCtx.beginPath();
+        staticCtx.moveTo(WALL, TOP_LINE);
+        staticCtx.lineTo(WIDTH - WALL, TOP_LINE);
+        staticCtx.stroke();
+        staticCtx.restore();
+
+        staticCtx.fillStyle = "#dec58e";
+        staticCtx.shadowColor = "#dab978";
+        staticCtx.shadowBlur = 7;
+        staticCtx.font = "750 9px system-ui, sans-serif";
+        staticCtx.textAlign = "left";
+        staticCtx.fillText("KRİTİK YÖRÜNGE", WALL + 10, TOP_LINE - 9);
+        staticCtx.shadowBlur = 0;
+      }
+
+      function drawBackground(now) {
+        ctx.drawImage(backgroundCanvas, 0, 0);
         ctx.fillStyle = "#ffffff";
         for (const star of backgroundStars) {
           const twinkle = (Math.sin(now * 0.001 * star.speed + star.phase) + 1) / 2;
           ctx.globalAlpha = 0.38 + twinkle * 0.58;
-          ctx.shadowColor = "#d9e8ff";
-          ctx.shadowBlur = 2 + twinkle * (star.radius > 1 ? 10 : 5);
-          ctx.beginPath();
-          ctx.arc(star.x, star.y, star.radius * (0.8 + twinkle * 0.35), 0, Math.PI * 2);
-          ctx.fill();
+          const size = star.radius * (0.8 + twinkle * 0.35);
+          ctx.fillRect(star.x - size / 2, star.y - size / 2, size, size);
         }
         ctx.globalAlpha = 1;
-        ctx.shadowBlur = 0;
 
         if (!shootingStars.length && now >= nextShootingStarAt) {
           const count = Math.random() < 0.28 ? 2 : 1;
@@ -1426,39 +1464,6 @@
           if (!shootingStars.length) nextShootingStarAt = now + 6500 + Math.random() * 6500;
         }
 
-        const floor = ctx.createLinearGradient(0, HEIGHT - 35, 0, HEIGHT);
-        floor.addColorStop(0, "#25263a");
-        floor.addColorStop(1, "#131522");
-        ctx.fillStyle = floor;
-        ctx.fillRect(0, HEIGHT - WALL, WIDTH, WALL);
-
-        ctx.fillStyle = "#111522";
-        ctx.fillRect(0, 0, WALL, HEIGHT);
-        ctx.fillRect(WIDTH - WALL, 0, WALL, HEIGHT);
-        ctx.fillStyle = "#ffffff0e";
-        ctx.fillRect(WALL, 0, 2, HEIGHT);
-        ctx.fillRect(WIDTH - WALL - 2, 0, 2, HEIGHT);
-
-        ctx.save();
-        ctx.setLineDash([5, 8]);
-        ctx.lineWidth = 1.5;
-        ctx.strokeStyle = "#d1aa70";
-        ctx.shadowColor = "#dab978";
-        ctx.shadowBlur = 8;
-        ctx.globalAlpha = 0.8;
-        ctx.beginPath();
-        ctx.moveTo(WALL, TOP_LINE);
-        ctx.lineTo(WIDTH - WALL, TOP_LINE);
-        ctx.stroke();
-        ctx.restore();
-
-        ctx.fillStyle = "#dec58e";
-        ctx.shadowColor = "#dab978";
-        ctx.shadowBlur = 7;
-        ctx.font = "750 9px system-ui, sans-serif";
-        ctx.textAlign = "left";
-        ctx.fillText("KRİTİK YÖRÜNGE", WALL + 10, TOP_LINE - 9);
-        ctx.shadowBlur = 0;
       }
 
       function drawAnimal(animal) {
@@ -1662,8 +1667,11 @@
         sceneHue = (sceneHue + hueDifference * (1 - Math.exp(-elapsed * 0.65)) + 360) % 360;
 
         ctx.save();
-        ctx.filter = `hue-rotate(${sceneHue.toFixed(1)}deg)`;
         drawBackground(now);
+        if (sceneHue > 0.5) {
+          ctx.fillStyle = `hsla(${sceneHue.toFixed(0)}, 55%, 48%, 0.045)`;
+          ctx.fillRect(0, 0, WIDTH, HEIGHT);
+        }
 
         if (active && canDrop && !gameOver) {
           const radius = radiusOf(currentLevel);
@@ -1911,6 +1919,7 @@
         }
       } catch (error) {}
       if (!leaderboardConfigured) submitScoreButton.textContent = "Adınla yerel oyna";
+      drawStaticBackground();
       updateNext();
       updateShuffleButton();
       loadLeaderboard();
