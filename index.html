@@ -16,10 +16,10 @@
     * { box-sizing: border-box; }
     body {
       min-height: 100svh;
+      width: 100%;
       margin: 0;
       padding: max(14px, env(safe-area-inset-top)) 14px max(14px, env(safe-area-inset-bottom));
-      display: grid;
-      place-items: center;
+      overflow-x: clip;
       background:
         radial-gradient(ellipse at 14% 8%, #1e31503d 0, transparent 36%),
         radial-gradient(ellipse at 90% 86%, #58386630 0, transparent 34%),
@@ -27,7 +27,8 @@
     }
     .layout {
       width: min(100%, 510px);
-      margin: auto;
+      min-width: 0;
+      margin: 0 auto;
     }
     header {
       display: flex;
@@ -256,6 +257,8 @@
     .evolution {
       display: flex;
       align-items: center;
+      min-width: 0;
+      max-width: 100%;
       gap: 5px;
       overflow-x: auto;
       margin: 10px 2px 0;
@@ -373,6 +376,16 @@
     @media (max-height: 760px) and (min-width: 600px) {
       .layout { width: min(100%, 430px); }
       canvas { aspect-ratio: 440 / 600; }
+    }
+    @media (max-width: 380px) {
+      body { padding-right: 8px; padding-left: 8px; }
+      header { gap: 6px; }
+      .game-title { font-size: .58rem; letter-spacing: .09em; }
+      .score-card { gap: 8px; min-width: 0; padding: 7px 9px; }
+      .instructions { font-size: .7rem; }
+      .next { gap: 4px; padding-right: 6px; }
+      .queue-piece { gap: 3px; }
+      .next-name { font-size: .62rem; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; }
