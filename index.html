@@ -129,24 +129,31 @@
     }
     .board-control-group { display: inline-flex; gap: 7px; }
     .board-control {
-      min-height: 38px;
-      padding: 7px 12px;
-      border: 1px solid #d5bb7b45;
-      border-radius: 12px;
-      color: #f0d994;
-      background: linear-gradient(145deg, #151b2bd9, #0b1120e8);
-      box-shadow: 0 4px 15px #02040b88, inset 0 1px #ffffff18;
+      min-height: 44px;
+      padding: 9px 15px;
+      border: 1px solid #ffffff35;
+      border-radius: 14px;
+      color: #111827;
+      background: linear-gradient(145deg, #ffe9a5, #ddb85c);
+      box-shadow: 0 5px 18px #d6b85a45, inset 0 1px #fff9dc;
       backdrop-filter: blur(8px);
       font: inherit;
-      font-size: .72rem;
-      font-weight: 800;
+      font-size: .8rem;
+      font-weight: 900;
       cursor: pointer;
       pointer-events: auto;
       touch-action: manipulation;
+      transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
     }
-    .board-control:hover:not(:disabled) { background: #242b3c; }
-    .board-control:disabled { opacity: .48; cursor: not-allowed; }
-    .board-control:focus-visible { outline: 2px solid #e9d79e; outline-offset: 2px; }
+    .board-control:hover:not(:disabled) {
+      transform: translateY(-2px);
+      filter: brightness(1.12);
+      box-shadow: 0 8px 24px #d6b85a70, inset 0 1px #fff9dc;
+    }
+    .board-control:active:not(:disabled) { transform: translateY(1px) scale(.98); }
+    .board-control:disabled { filter: saturate(.82); opacity: .92; cursor: not-allowed; }
+    .board-control:focus-visible { outline: 3px solid #fff2bd; outline-offset: 3px; }
+    #openGameMenu::before { content: "☰"; margin-right: 7px; font-size: .9rem; }
     .sound-toggle {
       display: grid;
       width: 40px;
@@ -301,12 +308,21 @@
       cursor: pointer;
     }
     .board-control.shuffle-button {
-      min-height: 38px;
-      padding: 7px 12px;
-      border-radius: 12px;
-      color: #f0d994;
-      background: linear-gradient(145deg, #342b1dd9, #111521ed);
-      font-size: .72rem;
+      min-height: 44px;
+      padding: 9px 14px;
+      border-color: #bcffff9c;
+      color: #07333b;
+      background: linear-gradient(145deg, #9af4e5, #55cbbd);
+      box-shadow: 0 5px 20px #50d7c346, inset 0 1px #e6fffc;
+      font-size: .78rem;
+    }
+    .board-control.shuffle-button::before {
+      content: "✦";
+      margin-right: 6px;
+      font-size: .9rem;
+    }
+    .board-control.shuffle-button:hover:not(:disabled) {
+      box-shadow: 0 8px 25px #50d7c370, inset 0 1px #e6fffc;
     }
     .shuffle-button:disabled { opacity: .45; cursor: not-allowed; }
     .shuffle-button:focus-visible { outline: 2px solid #cfb577; outline-offset: 2px; }
