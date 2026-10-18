@@ -726,10 +726,10 @@
         { name: "Galactic Core", radius: 128, color: "#bb4fd4", accent: "#ffe0ff", surface: "galaxy", ring: true, glow: true },
       ];
       const DIFFICULTY = {
-        maxDropLevel: 4,
+        maxDropLevel: 5,
         gravity: 1680,
         dropCooldown: 490,
-        lineGrace: 0.48,
+        lineGrace: 0.3,
       };
       const leaderboardConfigured = /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL)
         && SUPABASE_ANON_KEY.length > 20;
@@ -965,6 +965,7 @@
       let scoreBursts = [];
       let score = 0;
       let runStartedAt = 0;
+      let runBestScore = 0;
       let comboCount = 0;
       let lastMergeAt = -Infinity;
       let shuffleUsed = false;
@@ -993,6 +994,21 @@
 
       function updateScore() {
         scoreNode.textContent = String(score);
+        if (score <= bestScore) return;
+
+        bestScore = score;
+        bestScoreNode.textContent = String(bestScore);
+        try {
+          const savedBest = Number(localStorage.getItem(BEST_SCORE_KEY));
+          if (Number.isFinite(savedBest) && savedBest > bestScore) {
+            bestScore = savedBest;
+            bestScoreNode.textContent = String(bestScore);
+          }
+          localStorage.setItem(BEST_SCORE_KEY, String(bestScore));
+        } catch (error) {
+          comboStatus.textContent = "Could not save your personal best. Browser storage is unavailable.";
+          comboStatus.hidden = false;
+        }
       }
 
       function updateSoundButton() {
@@ -1804,12 +1820,8 @@
         gameMenuOverlay.hidden = true;
         updateShuffleButton();
         updateGameMenuButton();
-        const isNewRecord = score > bestScore;
-        if (isNewRecord) {
-          bestScore = score;
-          bestScoreNode.textContent = String(bestScore);
-          try { localStorage.setItem(BEST_SCORE_KEY, String(bestScore)); } catch (error) {}
-        }
+        const isNewRecord = score > runBestScore;
+        updateScore();
         const duration = Math.max(0, Math.floor((performance.now() - runStartedAt) / 1000));
         const durationText = `${Math.floor(duration / 60)}:${String(duration % 60).padStart(2, "0")}`;
         overlayTitle.textContent = isNewRecord ? "New Record!" : "Game Over!";
@@ -1835,6 +1847,7 @@
         score = 0;
         comboCount = 0;
         lastMergeAt = -Infinity;
+        runBestScore = bestScore;
         comboStatus.hidden = true;
         shuffleUsed = false;
         paused = false;
