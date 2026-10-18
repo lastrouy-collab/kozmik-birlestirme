@@ -240,6 +240,17 @@
       cursor: pointer;
     }
     .toolbar-actions { display: inline-flex; gap: 6px; }
+    .leaderboard-toggle {
+      padding: 5px 9px;
+      border: 1px solid #ffffff1a;
+      border-radius: 8px;
+      color: #c7d3e8;
+      background: #ffffff08;
+      font: inherit;
+      font-size: .66rem;
+      cursor: pointer;
+    }
+    .leaderboard-toggle:focus-visible { outline: 2px solid #cfb577; outline-offset: 2px; }
     .shuffle-button {
       padding: 5px 9px;
       border: 1px solid #b8a36c55;
@@ -290,11 +301,29 @@
     }
     .evolution-arrow { flex: 0 0 auto; color: #aa9461; font-size: .7rem; }
     .leaderboard {
-      margin: 12px 2px 0;
+      width: 100%;
+      max-height: min(78svh, 620px);
+      overflow-y: auto;
       padding: 14px 15px;
       border: 1px solid #c1cee018;
       border-radius: 14px;
       background: linear-gradient(140deg, #ffffff08, #ffffff03);
+    }
+    .leaderboard-overlay {
+      position: fixed;
+      z-index: 10;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      background: #070a13dc;
+      backdrop-filter: blur(8px);
+    }
+    .leaderboard-overlay[hidden] { display: none; }
+    .leaderboard-dialog {
+      width: min(100%, 430px);
+      max-height: 100%;
+      overflow: auto;
     }
     .leaderboard-head {
       display: flex;
@@ -427,6 +456,21 @@
         </div>
       </section>
     </div>
+    <section class="leaderboard-overlay" id="leaderboardOverlay" hidden>
+      <div class="leaderboard-dialog" role="dialog" aria-modal="true" aria-labelledby="leaderboardTitle">
+        <section class="leaderboard" aria-labelledby="leaderboardTitle">
+          <div class="leaderboard-head">
+            <h2 id="leaderboardTitle">Oyuncular arası ilk 10</h2>
+            <div class="toolbar-actions">
+              <button class="refresh-scores" id="refreshScores" type="button">Yenile</button>
+              <button class="refresh-scores" id="closeLeaderboard" type="button" aria-label="Sıralamayı kapat">Kapat</button>
+            </div>
+          </div>
+          <p id="leaderboardStatus" role="status">Skorlar yükleniyor…</p>
+          <ol id="leaderboardList" aria-label="En yüksek skorlar"></ol>
+        </section>
+      </div>
+    </section>
 
     <div class="instructions">
       <span>Sürükleyerek konum seç · parmağını kaldırınca bırak.</span>
@@ -439,6 +483,7 @@
     <div class="game-toolbar">
       <span class="combo-status" id="comboStatus" role="status" hidden></span>
       <div class="toolbar-actions">
+        <button class="leaderboard-toggle" id="openLeaderboard" type="button">İlk 10</button>
         <button class="shuffle-button" id="shuffleButton" type="button" disabled>Karıştır (1)</button>
         <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false">Ses: Kapalı</button>
       </div>
@@ -464,14 +509,6 @@
       <span class="evolution-animal">Yıldız kümesi</span><span class="evolution-arrow">›</span>
       <span class="evolution-animal">Galaksi çekirdeği</span>
     </div>
-    <section class="leaderboard" aria-labelledby="leaderboardTitle">
-      <div class="leaderboard-head">
-        <h2 id="leaderboardTitle">Oyuncular arası ilk 10</h2>
-        <button class="refresh-scores" id="refreshScores" type="button">Yenile</button>
-      </div>
-      <p id="leaderboardStatus" role="status">Skorlar yükleniyor…</p>
-      <ol id="leaderboardList" aria-label="En yüksek skorlar"></ol>
-    </section>
   </main>
 
   <script>
@@ -500,6 +537,9 @@
       const leaderboardStatus = document.querySelector("#leaderboardStatus");
       const leaderboardList = document.querySelector("#leaderboardList");
       const refreshScoresButton = document.querySelector("#refreshScores");
+      const leaderboardOverlay = document.querySelector("#leaderboardOverlay");
+      const openLeaderboardButton = document.querySelector("#openLeaderboard");
+      const closeLeaderboardButton = document.querySelector("#closeLeaderboard");
 
       // Fill these from Supabase Project Settings > API. Never use a service_role key here.
       const SUPABASE_URL = "";
@@ -707,6 +747,17 @@
         } finally {
           refreshScoresButton.disabled = false;
         }
+      }
+
+      function openLeaderboard() {
+        leaderboardOverlay.hidden = false;
+        closeLeaderboardButton.focus();
+        void loadLeaderboard();
+      }
+
+      function closeLeaderboard() {
+        leaderboardOverlay.hidden = true;
+        openLeaderboardButton.focus();
       }
 
       async function registerPlayerAndStart(event) {
@@ -1634,6 +1685,14 @@
       startButton.textContent = "Yeni sefer";
       startButton.addEventListener("click", startGame);
       shuffleButton.addEventListener("click", shufflePlanets);
+      openLeaderboardButton.addEventListener("click", openLeaderboard);
+      closeLeaderboardButton.addEventListener("click", closeLeaderboard);
+      leaderboardOverlay.addEventListener("click", event => {
+        if (event.target === leaderboardOverlay) closeLeaderboard();
+      });
+      window.addEventListener("keydown", event => {
+        if (event.key === "Escape" && !leaderboardOverlay.hidden) closeLeaderboard();
+      });
       scoreForm.addEventListener("submit", registerPlayerAndStart);
       playerNameInput.addEventListener("input", () => playerNameInput.setCustomValidity(""));
       refreshScoresButton.addEventListener("click", loadLeaderboard);
