@@ -116,6 +116,55 @@
       box-shadow: 0 22px 64px #02040bba, 0 0 34px #93a9e50c, inset 0 1px #ffffff20;
       touch-action: none;
     }
+    .board-controls {
+      position: absolute;
+      z-index: 2;
+      top: 10px;
+      right: 10px;
+      left: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+    .board-control-group { display: inline-flex; gap: 7px; }
+    .board-control {
+      min-height: 38px;
+      padding: 7px 12px;
+      border: 1px solid #d5bb7b45;
+      border-radius: 12px;
+      color: #f0d994;
+      background: linear-gradient(145deg, #151b2bd9, #0b1120e8);
+      box-shadow: 0 4px 15px #02040b88, inset 0 1px #ffffff18;
+      backdrop-filter: blur(8px);
+      font: inherit;
+      font-size: .72rem;
+      font-weight: 800;
+      cursor: pointer;
+      pointer-events: auto;
+      touch-action: manipulation;
+    }
+    .board-control:hover:not(:disabled) { background: #242b3c; }
+    .board-control:disabled { opacity: .48; cursor: not-allowed; }
+    .board-control:focus-visible { outline: 2px solid #e9d79e; outline-offset: 2px; }
+    .sound-toggle {
+      display: grid;
+      width: 40px;
+      min-height: 40px;
+      place-items: center;
+      padding: 0;
+      border-radius: 50%;
+      color: #c5cede;
+    }
+    .sound-toggle[aria-pressed="true"] {
+      color: #f0d994;
+      border-color: #e4c87899;
+      background: linear-gradient(145deg, #67532cbb, #171625ed);
+      box-shadow: 0 0 18px #d6b85a36, inset 0 1px #ffffff24;
+    }
+    .sound-toggle svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.8; }
+    .sound-toggle:disabled { opacity: .5; cursor: not-allowed; }
+    .sound-toggle[hidden], .sound-toggle svg[hidden] { display: none; }
     canvas {
       display: block;
       width: 100%;
@@ -229,16 +278,6 @@
       text-shadow: 0 0 12px #e9bd5c55;
     }
     .combo-status[hidden] { display: none; }
-    .sound-toggle {
-      padding: 5px 9px;
-      border: 1px solid #ffffff1a;
-      border-radius: 8px;
-      color: #aab6cc;
-      background: #ffffff08;
-      font: inherit;
-      font-size: .66rem;
-      cursor: pointer;
-    }
     .toolbar-actions { display: inline-flex; gap: 6px; }
     .leaderboard-toggle {
       padding: 5px 9px;
@@ -261,10 +300,16 @@
       font-size: .66rem;
       cursor: pointer;
     }
+    .board-control.shuffle-button {
+      min-height: 38px;
+      padding: 7px 12px;
+      border-radius: 12px;
+      color: #f0d994;
+      background: linear-gradient(145deg, #342b1dd9, #111521ed);
+      font-size: .72rem;
+    }
     .shuffle-button:disabled { opacity: .45; cursor: not-allowed; }
     .shuffle-button:focus-visible { outline: 2px solid #cfb577; outline-offset: 2px; }
-    .sound-toggle[aria-pressed="true"] { color: #e6d197; border-color: #d5bb7b55; }
-    .sound-toggle:focus-visible { outline: 2px solid #cfb577; outline-offset: 2px; }
     .evolution {
       display: flex;
       align-items: center;
@@ -477,6 +522,24 @@
       <canvas id="game" width="440" height="650" aria-label="Kozmik cisimleri birleştirme oyun alanı">
         Oyunu oynamak için canvas destekli bir tarayıcı kullanın.
       </canvas>
+      <div class="board-controls" aria-label="Oyun kontrolleri">
+        <div class="board-control-group">
+          <button class="board-control" id="openGameMenu" type="button" disabled>Menü</button>
+          <button class="board-control shuffle-button" id="shuffleButton" type="button" disabled>Karıştır (1)</button>
+        </div>
+        <button class="board-control sound-toggle" id="soundToggle" type="button" aria-label="Sesi aç" title="Sesi aç" aria-pressed="false">
+          <svg id="soundIconOn" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M11 5 6 9H3v6h3l5 4z"></path>
+            <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
+            <path d="M18.5 5.5a9 9 0 0 1 0 13"></path>
+          </svg>
+          <svg id="soundIconOff" viewBox="0 0 24 24" aria-hidden="true" hidden>
+            <path d="M11 5 6 9H3v6h3l5 4z"></path>
+            <path d="m16 9 5 6"></path>
+            <path d="m21 9-5 6"></path>
+          </svg>
+        </button>
+      </div>
       <section class="overlay" id="overlay" aria-labelledby="overlayTitle">
         <div class="dialog">
           <div class="brand-mark" aria-hidden="true">✦</div>
@@ -527,10 +590,7 @@
     <div class="game-toolbar">
       <span class="combo-status" id="comboStatus" role="status" hidden></span>
       <div class="toolbar-actions">
-        <button class="leaderboard-toggle" id="openGameMenu" type="button" disabled>Menü</button>
         <button class="leaderboard-toggle" id="openLeaderboard" type="button">İlk 10</button>
-        <button class="shuffle-button" id="shuffleButton" type="button" disabled>Karıştır (1)</button>
-        <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false">Ses: Kapalı</button>
       </div>
     </div>
     <div class="evolution" aria-label="Kozmik evrim zinciri">
@@ -570,6 +630,8 @@
       const comboStatus = document.querySelector("#comboStatus");
       const shuffleButton = document.querySelector("#shuffleButton");
       const soundToggle = document.querySelector("#soundToggle");
+      const soundIconOn = document.querySelector("#soundIconOn");
+      const soundIconOff = document.querySelector("#soundIconOff");
       const brandMark = document.querySelector(".brand-mark");
       const overlay = document.querySelector("#overlay");
       const overlayTitle = document.querySelector("#overlayTitle");
@@ -902,8 +964,15 @@
       }
 
       function updateSoundButton() {
-        soundToggle.textContent = soundEnabled ? "Ses: Açık" : "Ses: Kapalı";
         soundToggle.setAttribute("aria-pressed", String(soundEnabled));
+        const soundSupported = typeof window.AudioContext === "function";
+        const label = soundSupported
+          ? (soundEnabled ? "Sesi kapat" : "Sesi aç")
+          : "Ses desteklenmiyor";
+        soundToggle.setAttribute("aria-label", label);
+        soundToggle.title = label;
+        soundIconOn.hidden = !soundEnabled;
+        soundIconOff.hidden = soundEnabled;
       }
 
       function updateShuffleButton() {
@@ -1805,7 +1874,6 @@
       soundToggle.addEventListener("click", toggleSound);
       if (typeof window.AudioContext !== "function") {
         soundToggle.disabled = true;
-        soundToggle.textContent = "Ses desteklenmiyor";
       }
       try {
         const savedBest = Number(localStorage.getItem(BEST_SCORE_KEY));
