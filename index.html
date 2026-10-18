@@ -1096,7 +1096,6 @@
           level, x, y, vx, vy,
           r: radiusOf(level),
           born,
-          compressionLiftAt: -Infinity,
           overLine: 0,
           wobble: Math.random() * Math.PI * 2,
         });
@@ -1206,7 +1205,6 @@
           animal.vx = 0;
           animal.vy = 0;
           animal.born = now;
-          animal.compressionLiftAt = -Infinity;
           animal.overLine = 0;
           for (let i = 0; i < 4; i += 1) {
             const angle = Math.random() * Math.PI * 2;
@@ -1254,7 +1252,7 @@
           }
           if (animal.y + animal.r > HEIGHT - WALL) {
             animal.y = HEIGHT - WALL - animal.r;
-            if (animal.vy > 45) animal.vy *= -0.16;
+            if (animal.vy > 45) animal.vy *= -0.025;
             else animal.vy = 0;
             animal.vx *= 0.985;
           }
@@ -1285,15 +1283,8 @@
               const nx = dx / distance;
               const ny = dy / distance;
               const overlap = minimum - distance;
-              if (overlap > 5 && Math.abs(ny) > 0.72) {
-                const upper = a.y < b.y ? a : b;
-                if (now - upper.born > 240 && now - upper.compressionLiftAt > 650 && upper.vy > -80) {
-                  upper.vy = -Math.min(300, 120 + overlap * 7);
-                  upper.compressionLiftAt = now;
-                }
-              }
               const totalMass = a.r * a.r + b.r * b.r;
-              const correction = Math.max(0, overlap - 0.15) * 0.92;
+              const correction = Math.max(0, overlap - 0.5) * 0.78;
               const moveA = correction * b.r * b.r / totalMass;
               const moveB = correction * a.r * a.r / totalMass;
               a.x -= nx * moveA;
@@ -1303,14 +1294,18 @@
 
               const relativeVelocity = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
               if (relativeVelocity < 0) {
-                const impulse = -(0.12 * relativeVelocity) / (1 / (a.r * a.r) + 1 / (b.r * b.r));
+                const restitution = Math.abs(relativeVelocity) > 180 ? 0.025 : 0;
+                const impulse = -((1 + restitution) * relativeVelocity) / (1 / (a.r * a.r) + 1 / (b.r * b.r));
                 a.vx -= impulse * nx / (a.r * a.r);
                 a.vy -= impulse * ny / (a.r * a.r);
                 b.vx += impulse * nx / (b.r * b.r);
                 b.vy += impulse * ny / (b.r * b.r);
+                if (Math.abs(relativeVelocity) < 18) {
+                  a.vx *= 0.985;
+                  b.vx *= 0.985;
+                }
               }
             }
-            if (pass === 4) break;
           }
         }
 
