@@ -1096,7 +1096,6 @@
           level, x, y, vx, vy,
           r: radiusOf(level),
           born,
-          rollDirection: Math.random() < 0.5 ? -1 : 1,
           overLine: 0,
           wobble: Math.random() * Math.PI * 2,
         });
@@ -1291,21 +1290,6 @@
               const nx = dx / distance;
               const ny = dy / distance;
               const overlap = minimum - distance;
-              const upper = a.y < b.y ? a : b;
-              if (ny * (upper === a ? 1 : -1) > 0.82 && overlap > -1) {
-                const slope = nx * ny;
-                const roll = Math.abs(slope) < 0.08
-                  ? upper.rollDirection
-                  : -Math.sign(slope);
-                const contact = Math.min(1, Math.max(0.2, overlap + 1));
-                upper.vx = Math.max(-260, Math.min(260,
-                  upper.vx + roll * DIFFICULTY.gravity * safeDt * contact * 0.85
-                ));
-                if (Math.abs(nx) < 0.08) {
-                  const lower = upper === a ? b : a;
-                  lower.vx -= roll * DIFFICULTY.gravity * safeDt * contact * 0.12;
-                }
-              }
               const totalMass = a.r * a.r + b.r * b.r;
               const correction = Math.max(0, overlap - 0.5) * 0.78;
               const moveA = correction * b.r * b.r / totalMass;
