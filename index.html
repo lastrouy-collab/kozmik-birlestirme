@@ -1,11 +1,12 @@
 <!doctype html>
-<html lang="tr">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#090626">
   <link rel="icon" href="assets/cosmic-cat.jpeg" type="image/jpeg">
-  <title>Kozmik Birleştirme</title>
+  <meta name="description" content="Merge cosmic objects, grow your star system, and explore the universe with a cosmic cat.">
+  <title>Cosmic Merge</title>
   <style>
     :root {
       color-scheme: dark;
@@ -529,29 +530,29 @@
 <body>
   <main class="layout">
     <header>
-      <p class="game-title">Kozmik Birleştirme</p>
-      <div class="score-card" aria-label="Skor ve kişisel rekor">
+      <p class="game-title">Cosmic Merge</p>
+      <div class="score-card" aria-label="Score and personal best">
         <div class="score-summary">
-          <span class="score-label">SKOR</span>
+          <span class="score-label">SCORE</span>
           <span id="score" aria-live="polite">0</span>
         </div>
         <div class="best-summary">
-          <span class="best-label">REKOR</span>
+          <span class="best-label">BEST</span>
           <span id="bestScore">0</span>
         </div>
       </div>
     </header>
 
     <div class="board-frame">
-      <canvas id="game" width="440" height="650" aria-label="Kozmik cisimleri birleştirme oyun alanı">
-        Oyunu oynamak için canvas destekli bir tarayıcı kullanın.
+      <canvas id="game" width="440" height="650" aria-label="Cosmic object merging game board">
+        Use a canvas-enabled browser to play this game.
       </canvas>
-      <div class="board-controls" aria-label="Oyun kontrolleri">
+      <div class="board-controls" aria-label="Game controls">
         <div class="board-control-group">
-          <button class="board-control" id="openGameMenu" type="button" disabled>Menü</button>
-          <button class="board-control shuffle-button" id="shuffleButton" type="button" disabled>Karıştır (1)</button>
+          <button class="board-control" id="openGameMenu" type="button" disabled>Menu</button>
+          <button class="board-control shuffle-button" id="shuffleButton" type="button" disabled>Shuffle (1)</button>
         </div>
-        <button class="board-control sound-toggle" id="soundToggle" type="button" aria-label="Sesi aç" title="Sesi aç" aria-pressed="false">
+        <button class="board-control sound-toggle" id="soundToggle" type="button" aria-label="Turn sound on" title="Turn sound on" aria-pressed="false">
           <svg id="soundIconOn" viewBox="0 0 24 24" aria-hidden="true">
             <path d="M11 5 6 9H3v6h3l5 4z"></path>
             <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
@@ -567,15 +568,15 @@
       <section class="overlay" id="overlay" aria-labelledby="overlayTitle">
         <div class="dialog">
           <div class="brand-mark" aria-hidden="true">🐱</div>
-          <h2 id="overlayTitle">Yörüngeye gir</h2>
-          <p id="overlayText">Gök cisimlerini bırak, eşleşenleri birleştir ve yıldız sistemini büyüt. Kütleyi kritik çizginin altında tut.</p>
+          <h2 id="overlayTitle">Enter the orbit</h2>
+          <p id="overlayText">Drop cosmic objects, merge matching ones, and grow your star system. Keep the mass below the critical line.</p>
           <form class="score-form" id="scoreForm">
-            <label for="playerName">Sana özel kullanıcı adını belirle</label>
-            <input id="playerName" name="playerName" type="text" autocomplete="username" maxlength="18" minlength="3" pattern="[A-Za-z0-9_]+" required placeholder="Örn. KozmikGezgin" aria-describedby="scoreSubmitStatus">
-            <button class="button" id="submitScore" type="submit">Kullanıcı adını al ve başla</button>
+            <label for="playerName">Choose your player name</label>
+            <input id="playerName" name="playerName" type="text" autocomplete="username" maxlength="18" minlength="3" pattern="[A-Za-z0-9_]+" required placeholder="e.g. CosmicTraveler" aria-describedby="scoreSubmitStatus">
+            <button class="button" id="submitScore" type="submit">Claim name &amp; play</button>
           </form>
-          <p id="scoreSubmitStatus" role="status">Çevrim içi kullanıcı adı ve skor tablosu için Supabase bağlantısı gerekir.</p>
-          <button class="button" id="startButton" type="button" hidden>Seferi başlat</button>
+          <p id="scoreSubmitStatus" role="status">A Supabase connection is required for online player names and leaderboards.</p>
+          <button class="button" id="startButton" type="button" hidden>Start game</button>
         </div>
       </section>
     </div>
@@ -583,60 +584,60 @@
       <div class="leaderboard-dialog" role="dialog" aria-modal="true" aria-labelledby="leaderboardTitle">
         <section class="leaderboard" aria-labelledby="leaderboardTitle">
           <div class="leaderboard-head">
-            <h2 id="leaderboardTitle">Oyuncular arası ilk 10</h2>
+            <h2 id="leaderboardTitle">Top 10 Players</h2>
             <div class="toolbar-actions">
-              <button class="refresh-scores" id="refreshScores" type="button">Yenile</button>
-              <button class="refresh-scores" id="closeLeaderboard" type="button" aria-label="Sıralamayı kapat">Kapat</button>
+              <button class="refresh-scores" id="refreshScores" type="button">Refresh</button>
+              <button class="refresh-scores" id="closeLeaderboard" type="button" aria-label="Close leaderboard">Close</button>
             </div>
           </div>
-          <p id="leaderboardStatus" role="status">Skorlar yükleniyor…</p>
-          <ol id="leaderboardList" aria-label="En yüksek skorlar"></ol>
+          <p id="leaderboardStatus" role="status">Loading scores…</p>
+          <ol id="leaderboardList" aria-label="Top scores"></ol>
         </section>
       </div>
     </section>
     <section class="game-menu-overlay" id="gameMenuOverlay" hidden>
       <div class="game-menu-dialog" role="dialog" aria-modal="true" aria-labelledby="gameMenuTitle">
-        <h2 id="gameMenuTitle">Oyun menüsü</h2>
-        <button class="button" id="resumeGameButton" type="button">Devam et</button>
-        <button class="menu-secondary" id="restartGameButton" type="button">Baştan başla</button>
-        <button class="menu-secondary" id="mainMenuButton" type="button">Ana menü</button>
+        <h2 id="gameMenuTitle">Game menu</h2>
+        <button class="button" id="resumeGameButton" type="button">Resume</button>
+        <button class="menu-secondary" id="restartGameButton" type="button">Restart</button>
+        <button class="menu-secondary" id="mainMenuButton" type="button">Main menu</button>
       </div>
     </section>
 
     <div class="instructions">
-      <span>Sürükleyerek konum seç · parmağını kaldırınca bırak.</span>
-      <span class="next" aria-label="Sıradaki iki cisim">
-        <span class="queue-piece"><span class="queue-index">1</span><span class="next-orb" id="nextOrb" aria-hidden="true"></span><span class="next-name" id="nextName">Toz</span></span>
+      <span>Drag to aim · release to drop.</span>
+      <span class="next" aria-label="Next two objects">
+        <span class="queue-piece"><span class="queue-index">1</span><span class="next-orb" id="nextOrb" aria-hidden="true"></span><span class="next-name" id="nextName">Dust</span></span>
         <span class="next-divider" aria-hidden="true">·</span>
-        <span class="queue-piece"><span class="queue-index">2</span><span class="next-orb" id="nextOrb2" aria-hidden="true"></span><span class="next-name" id="nextName2">Toz</span></span>
+        <span class="queue-piece"><span class="queue-index">2</span><span class="next-orb" id="nextOrb2" aria-hidden="true"></span><span class="next-name" id="nextName2">Dust</span></span>
       </span>
     </div>
     <div class="game-toolbar">
       <span class="combo-status" id="comboStatus" role="status" hidden></span>
       <div class="toolbar-actions">
-        <button class="leaderboard-toggle" id="openLeaderboard" type="button">İlk 10</button>
+        <button class="leaderboard-toggle" id="openLeaderboard" type="button">Top 10</button>
       </div>
     </div>
-    <div class="evolution" aria-label="Kozmik evrim zinciri">
-      <span class="evolution-label">Evrim</span>
-      <span class="evolution-animal">Toz</span><span class="evolution-arrow">›</span>
-      <span class="evolution-animal">Kaya</span><span class="evolution-arrow">›</span>
-      <span class="evolution-animal">Ay</span><span class="evolution-arrow">›</span>
-      <span class="evolution-animal">Gezegen</span><span class="evolution-arrow">›</span>
-      <span class="evolution-animal">Halkalı</span><span class="evolution-arrow">›</span>
-      <span class="evolution-animal">Gaz devi</span><span class="evolution-arrow">›</span>
-      <span class="evolution-animal">Buz devi</span><span class="evolution-arrow">›</span>
-      <span class="evolution-animal">Süper dünya</span><span class="evolution-arrow">›</span>
-      <span class="evolution-animal">Cüce yıldız</span><span class="evolution-arrow">›</span>
-      <span class="evolution-animal">Yıldız</span><span class="evolution-arrow">›</span>
-      <span class="evolution-animal">Nötron</span><span class="evolution-arrow">›</span>
+    <div class="evolution" aria-label="Cosmic evolution chain">
+      <span class="evolution-label">EVOLUTION</span>
+      <span class="evolution-animal">Dust</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Rock</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Moon</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Planet</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Ringed Planet</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Gas Giant</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Ice Giant</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Super-Earth</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Dwarf Star</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Star</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Neutron Star</span><span class="evolution-arrow">›</span>
       <span class="evolution-animal">Pulsar</span><span class="evolution-arrow">›</span>
       <span class="evolution-animal">Magnetar</span><span class="evolution-arrow">›</span>
-      <span class="evolution-animal">Kara delik</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Black Hole</span><span class="evolution-arrow">›</span>
       <span class="evolution-animal">Quasar</span><span class="evolution-arrow">›</span>
-      <span class="evolution-animal">Bulutsu</span><span class="evolution-arrow">›</span>
-      <span class="evolution-animal">Yıldız kümesi</span><span class="evolution-arrow">›</span>
-      <span class="evolution-animal">Galaksi çekirdeği</span>
+      <span class="evolution-animal">Nebula</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Star Cluster</span><span class="evolution-arrow">›</span>
+      <span class="evolution-animal">Galactic Core</span>
     </div>
   </main>
 
@@ -705,24 +706,24 @@
       let shootingStars = [];
       let nextShootingStarAt = performance.now() + 4000 + Math.random() * 5000;
       const ANIMALS = [
-        { name: "Toz", radius: 13, color: "#b8a1ff", accent: "#f0ddff", surface: "dust" },
-        { name: "Kaya", radius: 15, color: "#e97d9e", accent: "#ffc2cc", surface: "rock" },
-        { name: "Ay", radius: 18, color: "#9da9e8", accent: "#e3e9ff", surface: "crater" },
-        { name: "Gezegen", radius: 21, color: "#2877ed", accent: "#75efff", surface: "ocean" },
-        { name: "Halkalı", radius: 25, color: "#eea34b", accent: "#ffe99a", surface: "bands", ring: true },
-        { name: "Gaz devi", radius: 30, color: "#ed7182", accent: "#ffd0aa", surface: "bands" },
-        { name: "Buz devi", radius: 35, color: "#36b9e7", accent: "#b9f7ff", surface: "bands", ring: true },
-        { name: "Süper dünya", radius: 41, color: "#42b89e", accent: "#b7ffbb", surface: "continents" },
-        { name: "Cüce yıldız", radius: 48, color: "#e65d9f", accent: "#ffb5eb", surface: "glow" },
-        { name: "Yıldız", radius: 56, color: "#f0a743", accent: "#fff3ae", surface: "star", glow: true },
-        { name: "Nötron", radius: 65, color: "#565bdb", accent: "#c2c4ff", surface: "pulse", glow: true },
+        { name: "Dust", radius: 13, color: "#b8a1ff", accent: "#f0ddff", surface: "dust" },
+        { name: "Rock", radius: 15, color: "#e97d9e", accent: "#ffc2cc", surface: "rock" },
+        { name: "Moon", radius: 18, color: "#9da9e8", accent: "#e3e9ff", surface: "crater" },
+        { name: "Planet", radius: 21, color: "#2877ed", accent: "#75efff", surface: "ocean" },
+        { name: "Ringed Planet", radius: 25, color: "#eea34b", accent: "#ffe99a", surface: "bands", ring: true },
+        { name: "Gas Giant", radius: 30, color: "#ed7182", accent: "#ffd0aa", surface: "bands" },
+        { name: "Ice Giant", radius: 35, color: "#36b9e7", accent: "#b9f7ff", surface: "bands", ring: true },
+        { name: "Super-Earth", radius: 41, color: "#42b89e", accent: "#b7ffbb", surface: "continents" },
+        { name: "Dwarf Star", radius: 48, color: "#e65d9f", accent: "#ffb5eb", surface: "glow" },
+        { name: "Star", radius: 56, color: "#f0a743", accent: "#fff3ae", surface: "star", glow: true },
+        { name: "Neutron Star", radius: 65, color: "#565bdb", accent: "#c2c4ff", surface: "pulse", glow: true },
         { name: "Pulsar", radius: 74, color: "#367ddd", accent: "#a8f2ff", surface: "pulse", ring: true, glow: true },
         { name: "Magnetar", radius: 83, color: "#a249e0", accent: "#f0b4ff", surface: "magnetic", ring: true, glow: true },
-        { name: "Kara delik", radius: 92, color: "#21153d", accent: "#ffda72", surface: "blackhole", ring: true, glow: true },
+        { name: "Black Hole", radius: 92, color: "#21153d", accent: "#ffda72", surface: "blackhole", ring: true, glow: true },
         { name: "Quasar", radius: 101, color: "#6454e8", accent: "#ffe07e", surface: "magnetic", ring: true, glow: true },
-        { name: "Bulutsu", radius: 110, color: "#9549d5", accent: "#efb3ff", surface: "glow", ring: true, glow: true },
-        { name: "Yıldız kümesi", radius: 119, color: "#3779bb", accent: "#ffe899", surface: "cluster", ring: true, glow: true },
-        { name: "Galaksi çekirdeği", radius: 128, color: "#bb4fd4", accent: "#ffe0ff", surface: "galaxy", ring: true, glow: true },
+        { name: "Nebula", radius: 110, color: "#9549d5", accent: "#efb3ff", surface: "glow", ring: true, glow: true },
+        { name: "Star Cluster", radius: 119, color: "#3779bb", accent: "#ffe899", surface: "cluster", ring: true, glow: true },
+        { name: "Galactic Core", radius: 128, color: "#bb4fd4", accent: "#ffe0ff", surface: "galaxy", ring: true, glow: true },
       ];
       const DIFFICULTY = {
         maxDropLevel: 4,
@@ -756,13 +757,13 @@
 
       function saveSession(session) {
         if (!session || typeof session.access_token !== "string" || typeof session.refresh_token !== "string") {
-          throw new Error("Supabase geçerli bir oturum döndürmedi.");
+          throw new Error("Supabase returned an invalid session.");
         }
         authSession = session;
         try {
           localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
         } catch (error) {
-          throw new Error("Oyuncu oturumu bu tarayıcıda saklanamadı.");
+          throw new Error("The player session could not be saved in this browser.");
         }
       }
 
@@ -770,8 +771,8 @@
         let body = null;
         try { body = await response.json(); } catch (error) {}
         const message = body && (body.message || body.msg || body.error_description || body.error);
-        if (response.status === 409 || /username.*taken|already.*claim|kullanıcı adı alınmış/i.test(String(message))) {
-          return new Error("Bu kullanıcı adı başka bir oyuncu tarafından alınmış. Başka bir ad dene.");
+        if (response.status === 409 || /username.*taken|already.*claim/i.test(String(message))) {
+          return new Error("That player name is already taken. Try another name.");
         }
         return new Error(message || `${fallback} (HTTP ${response.status}).`);
       }
@@ -782,7 +783,7 @@
           headers: supabaseHeaders({ "Content-Type": "application/json" }),
           body: JSON.stringify({ data: {} }),
         });
-        if (!response.ok) throw await responseError(response, "Oyuncu hesabı oluşturulamadı");
+        if (!response.ok) throw await responseError(response, "Could not create player account");
         const session = await response.json();
         saveSession(session);
         return session;
@@ -797,7 +798,7 @@
         });
         if (!response.ok) {
           authSession = null;
-          throw await responseError(response, "Oyuncu oturumu yenilenemedi");
+          throw await responseError(response, "Could not refresh player session");
         }
         const session = await response.json();
         saveSession(session);
@@ -808,7 +809,7 @@
         if (!authSession) authSession = readSavedSession();
         if (!authSession) {
           if (playerName) {
-            throw new Error("Bu kullanıcı adına bağlı oturum bu tarayıcıda bulunamadı; aynı adı güvenle doğrulayamıyoruz.");
+            throw new Error("The session linked to this player name was not found in this browser, so we cannot safely verify the name.");
           }
           await createAnonymousSession();
         }
@@ -830,10 +831,10 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ requested_name: requestedName }),
         });
-        if (!response.ok) throw await responseError(response, "Kullanıcı adı kaydedilemedi");
+        if (!response.ok) throw await responseError(response, "Could not save player name");
         const claimedName = await response.json();
         if (typeof claimedName !== "string" || !claimedName) {
-          throw new Error("Sunucu kullanıcı adı kaydını doğrulayamadı.");
+          throw new Error("The server could not verify the player name claim.");
         }
         playerName = claimedName;
         try { localStorage.setItem(PLAYER_NAME_KEY, playerName); } catch (error) {}
@@ -847,7 +848,7 @@
       function renderLeaderboard(rows) {
         leaderboardList.replaceChildren();
         if (!rows.length) {
-          setLeaderboardMessage("Henüz skor yok. İlk rekoru sen bırak!", false);
+          setLeaderboardMessage("No scores yet. Set the first record!", false);
           return;
         }
 
@@ -862,30 +863,30 @@
           name.textContent = row.player_name;
           const points = document.createElement("span");
           points.className = "leaderboard-score";
-          points.textContent = Number(row.score).toLocaleString("tr-TR");
+          points.textContent = Number(row.score).toLocaleString("en-US");
           item.append(place, name, points);
           leaderboardList.append(item);
         });
-        setLeaderboardMessage("Her oyuncunun en yüksek skoru gösteriliyor.", false);
+        setLeaderboardMessage("Showing each player's highest score.", false);
       }
 
       async function loadLeaderboard() {
         if (!leaderboardConfigured) {
-          setLeaderboardMessage("Çevrim içi tabloyu açmak için Supabase URL ve anon key yapılandırılmalı.", false);
+          setLeaderboardMessage("Configure a Supabase URL and anon key to enable the online leaderboard.", false);
           return;
         }
 
         refreshScoresButton.disabled = true;
-        setLeaderboardMessage("Skorlar yükleniyor…", false);
+        setLeaderboardMessage("Loading scores…", false);
         try {
           const response = await fetch(
             `${SUPABASE_URL}/rest/v1/orbit_leaderboard?select=player_name,score&order=score.desc,player_name.asc&limit=10`,
             { headers: supabaseHeaders() }
           );
-          if (!response.ok) throw new Error(`Skor tablosu yüklenemedi (HTTP ${response.status}).`);
+          if (!response.ok) throw new Error(`Could not load leaderboard (HTTP ${response.status}).`);
           renderLeaderboard(await response.json());
         } catch (error) {
-          setLeaderboardMessage(error.message || "Skor tablosuna bağlanılamadı.", true);
+          setLeaderboardMessage(error.message || "Could not connect to the leaderboard.", true);
         } finally {
           refreshScoresButton.disabled = false;
         }
@@ -906,7 +907,7 @@
         event.preventDefault();
         const requestedName = playerNameInput.value.trim();
         if (!/^[A-Za-z0-9_]{3,18}$/.test(requestedName)) {
-          playerNameInput.setCustomValidity("Kullanıcı adı 3–18 karakter olmalı; yalnızca İngilizce harf, rakam ve alt çizgi kullan.");
+          playerNameInput.setCustomValidity("Player names must be 3–18 characters and use only English letters, numbers, and underscores.");
           playerNameInput.reportValidity();
           return;
         }
@@ -915,7 +916,7 @@
         if (!leaderboardConfigured) {
           playerName = requestedName;
           try { localStorage.setItem(PLAYER_NAME_KEY, playerName); } catch (error) {}
-          scoreSubmitStatus.textContent = "Supabase bağlı değil; adın başka oyuncular için ayrılamaz ve skorun çevrim içi kaydedilmez. Yerel oyun başlıyor…";
+          scoreSubmitStatus.textContent = "Supabase is not connected, so your name cannot be claimed and your score will not be saved online. Starting local game…";
           window.setTimeout(() => {
             scoreForm.hidden = true;
             startGame();
@@ -924,38 +925,38 @@
         }
 
         submitScoreButton.disabled = true;
-        scoreSubmitStatus.textContent = "Kullanıcı adı kontrol ediliyor ve sana ayrılıyor…";
+        scoreSubmitStatus.textContent = "Checking and claiming your player name…";
         try {
           await claimPlayerName(requestedName);
-          scoreSubmitStatus.textContent = `@${playerName} adı sana ayrıldı. Sefer başlıyor…`;
+          scoreSubmitStatus.textContent = `@${playerName} is yours. Starting game…`;
           window.setTimeout(() => {
             scoreForm.hidden = true;
             startGame();
           }, 350);
         } catch (error) {
-          scoreSubmitStatus.textContent = error.message || "Kullanıcı adı kaydedilemedi. Bağlantını kontrol edip tekrar dene.";
+          scoreSubmitStatus.textContent = error.message || "Could not save player name. Check your connection and try again.";
           submitScoreButton.disabled = false;
         }
       }
 
       async function submitLeaderboardScore() {
         if (!leaderboardConfigured || !playerName) {
-          scoreSubmitStatus.textContent = "Skor kaydedilemedi: oyuncu hesabı veya çevrim içi bağlantı hazır değil.";
+          scoreSubmitStatus.textContent = "Score not saved: player account or online connection is unavailable.";
           return;
         }
 
-        scoreSubmitStatus.textContent = `@${playerName} için skor gönderiliyor…`;
+        scoreSubmitStatus.textContent = `Submitting score for @${playerName}…`;
         try {
           const response = await authenticatedFetch(`${SUPABASE_URL}/rest/v1/rpc/submit_orbit_score`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ p_score: score }),
           });
-          if (!response.ok) throw await responseError(response, "Skor gönderilemedi");
-          scoreSubmitStatus.textContent = `Skorun @${playerName} adıyla kaydedildi.`;
+          if (!response.ok) throw await responseError(response, "Could not submit score");
+          scoreSubmitStatus.textContent = `Your score was saved as @${playerName}.`;
           await loadLeaderboard();
         } catch (error) {
-          scoreSubmitStatus.textContent = error.message || "Skor gönderilemedi. Bağlantını kontrol edip tekrar dene.";
+          scoreSubmitStatus.textContent = error.message || "Could not submit score. Check your connection and try again.";
         }
       }
 
@@ -998,8 +999,8 @@
         soundToggle.setAttribute("aria-pressed", String(soundEnabled));
         const soundSupported = typeof window.AudioContext === "function";
         const label = soundSupported
-          ? (soundEnabled ? "Sesi kapat" : "Sesi aç")
-          : "Ses desteklenmiyor";
+          ? (soundEnabled ? "Turn sound off" : "Turn sound on")
+          : "Sound not supported";
         soundToggle.setAttribute("aria-label", label);
         soundToggle.title = label;
         soundIconOn.hidden = !soundEnabled;
@@ -1008,7 +1009,7 @@
 
       function updateShuffleButton() {
         shuffleButton.disabled = !active || gameOver || shuffleUsed || animals.length < 2;
-        shuffleButton.textContent = shuffleUsed ? "Karıştırıldı" : "Karıştır (1)";
+        shuffleButton.textContent = shuffleUsed ? "Shuffled" : "Shuffle (1)";
       }
 
       function updateGameMenuButton() {
@@ -1039,15 +1040,15 @@
         active = false;
         gameOver = false;
         aimingPointerId = null;
-        overlayTitle.textContent = "Kozmik Birleştirme";
-        overlayText.textContent = "Gök cisimlerini bırak, eşleşenleri birleştir ve yıldız sistemini büyüt. Kütleyi kritik çizginin altında tut.";
+        overlayTitle.textContent = "Cosmic Merge";
+        overlayText.textContent = "Drop cosmic objects, merge matching ones, and grow your star system. Keep the mass below the critical line.";
         scoreForm.hidden = false;
         startButton.hidden = true;
         scoreSubmitStatus.textContent = playerName
-          ? `Oyuncu: @${playerName}. Adını onaylayıp yeni sefer başlat.`
-          : "Supabase bağlı değil; yerel oynayabilirsin ancak kullanıcı adın ayrılmaz ve skorun çevrim içi kaydedilmez.";
+          ? `Player: @${playerName}. Confirm your name to start a new game.`
+          : "Supabase is not connected. You can play locally, but your name will not be claimed and your score will not be saved online.";
         if (playerName) playerNameInput.value = playerName;
-        if (!leaderboardConfigured) submitScoreButton.textContent = "Adınla yerel oyna";
+        if (!leaderboardConfigured) submitScoreButton.textContent = "Play locally";
         overlay.hidden = false;
         updateShuffleButton();
         updateGameMenuButton();
@@ -1063,7 +1064,7 @@
             void audioContext.resume().catch(() => {
               soundEnabled = false;
               updateSoundButton();
-              scoreSubmitStatus.textContent = "Ses başlatılamadı; tekrar açmak için ses düğmesine bas.";
+              scoreSubmitStatus.textContent = "Could not start audio. Press the sound button to try again.";
             });
           }
           const startAt = audioContext.currentTime;
@@ -1090,7 +1091,7 @@
         } catch (error) {
           soundEnabled = false;
           updateSoundButton();
-          scoreSubmitStatus.textContent = "Bu tarayıcıda ses efektleri başlatılamadı.";
+          scoreSubmitStatus.textContent = "Could not start sound effects in this browser.";
         }
       }
 
@@ -1187,7 +1188,7 @@
         score += points;
         makeMergeEffects(x, y, points);
         comboStatus.hidden = comboCount < 2;
-        if (comboCount > 1) comboStatus.textContent = `KOMBO x${comboCount} · +${comboBonus}`;
+        if (comboCount > 1) comboStatus.textContent = `COMBO x${comboCount} · +${comboBonus}`;
         playCatMeow(610 + Math.min(comboCount, 6) * 65, 0.32, comboCount > 1 ? 0.045 : 0.032);
         updateScore();
         flash = 0.13;
@@ -1218,7 +1219,7 @@
             }
           }
           if (!placement) {
-            comboStatus.textContent = "Yeterli boş alan yok; birkaç cismi birleştirip tekrar dene.";
+            comboStatus.textContent = "Not enough room. Merge a few objects and try again.";
             comboStatus.hidden = false;
             return;
           }
@@ -1253,7 +1254,7 @@
 
         comboCount = 0;
         lastMergeAt = -Infinity;
-        comboStatus.textContent = "Tüm gezegenler yeniden karıştırıldı!";
+        comboStatus.textContent = "All planets reshuffled!";
         comboStatus.hidden = false;
         shuffleUsed = true;
         updateShuffleButton();
@@ -1428,7 +1429,7 @@
         staticCtx.shadowBlur = 7;
         staticCtx.font = "750 9px system-ui, sans-serif";
         staticCtx.textAlign = "left";
-        staticCtx.fillText("KRİTİK YÖRÜNGE", WALL + 10, TOP_LINE - 9);
+        staticCtx.fillText("CRITICAL ORBIT", WALL + 10, TOP_LINE - 9);
         staticCtx.shadowBlur = 0;
       }
 
@@ -1811,15 +1812,15 @@
         }
         const duration = Math.max(0, Math.floor((performance.now() - runStartedAt) / 1000));
         const durationText = `${Math.floor(duration / 60)}:${String(duration % 60).padStart(2, "0")}`;
-        overlayTitle.textContent = isNewRecord ? "Yeni Rekor!" : "Oyun bitti!";
-        overlayText.textContent = `Skor: ${score} · Rekor: ${bestScore} · Süre: ${durationText}`;
+        overlayTitle.textContent = isNewRecord ? "New Record!" : "Game Over!";
+        overlayText.textContent = `Score: ${score} · Best: ${bestScore} · Time: ${durationText}`;
         brandMark.classList.toggle("record-break", isNewRecord);
-        startButton.textContent = "Yeni sefer";
+        startButton.textContent = "Play again";
         startButton.hidden = false;
         scoreForm.hidden = true;
         scoreSubmitStatus.textContent = leaderboardConfigured
-          ? `@${playerName || "oyuncu"} için skor gönderiliyor…`
-          : `Yerel oyun tamamlandı. Skor: ${score}. Çevrim içi kayıt için Supabase bağlantısı gerekli.`;
+          ? `Submitting score for @${playerName || "player"}…`
+          : `Local game complete. Score: ${score}. A Supabase connection is required to save scores online.`;
         overlay.hidden = false;
         playCatMeow(isNewRecord ? 850 : 340, isNewRecord ? 0.48 : 0.32, 0.038);
         draw();
@@ -1912,7 +1913,7 @@
         }
       });
 
-      startButton.textContent = "Yeni sefer";
+      startButton.textContent = "Play again";
       startButton.addEventListener("click", startGame);
       shuffleButton.addEventListener("click", shufflePlanets);
       openGameMenuButton.addEventListener("click", openGameMenu);
@@ -1946,15 +1947,15 @@
           playerName = savedName;
           playerNameInput.value = savedName;
           scoreSubmitStatus.textContent = leaderboardConfigured
-            ? `Kayıtlı oyuncu: @${savedName}. Devam etmek için kullanıcı adını doğrula.`
-            : `Yerel oyuncu: @${savedName}. Bu ad çevrim içi ayrılmadı; çevrim içi skor tablosu kullanılamıyor.`;
+            ? `Saved player: @${savedName}. Verify your player name to continue.`
+            : `Local player: @${savedName}. This name is not claimed online, and the online leaderboard is unavailable.`;
         } else {
           scoreSubmitStatus.textContent = leaderboardConfigured
-            ? "Kullanıcı adın bu tarayıcıdaki oyuncu hesabına bağlanır; tarayıcı verilerini temizlersen hesap kurtarılamaz."
-            : "Supabase bağlı değil; yerel oynayabilirsin ancak kullanıcı adın ayrılmaz ve skorun çevrim içi kaydedilmez.";
+            ? "Your player name is linked to this browser. Clearing browser data will make the account unrecoverable."
+            : "Supabase is not connected. You can play locally, but your name will not be claimed and your score will not be saved online.";
         }
       } catch (error) {}
-      if (!leaderboardConfigured) submitScoreButton.textContent = "Adınla yerel oyna";
+      if (!leaderboardConfigured) submitScoreButton.textContent = "Play locally";
       drawStaticBackground();
       updateNext();
       updateShuffleButton();
