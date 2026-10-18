@@ -1341,7 +1341,8 @@
 
               const relativeVelocity = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
               if (relativeVelocity < 0) {
-                const restitution = Math.abs(relativeVelocity) > 180 ? 0.025 : 0;
+                const impactSpeed = Math.abs(relativeVelocity);
+                const restitution = impactSpeed > 60 ? 0.22 : 0;
                 const impulse = -((1 + restitution) * relativeVelocity) / (1 / (a.r * a.r) + 1 / (b.r * b.r));
                 a.vx -= impulse * nx / (a.r * a.r);
                 a.vy -= impulse * ny / (a.r * a.r);
