@@ -320,11 +320,47 @@
       backdrop-filter: blur(8px);
     }
     .leaderboard-overlay[hidden] { display: none; }
+    .game-menu-overlay {
+      position: fixed;
+      z-index: 11;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 16px;
+      background: #070a13dc;
+      backdrop-filter: blur(8px);
+    }
+    .game-menu-overlay[hidden] { display: none; }
     .leaderboard-dialog {
       width: min(100%, 430px);
       max-height: 100%;
       overflow: auto;
     }
+    .game-menu-dialog {
+      display: grid;
+      gap: 10px;
+      width: min(100%, 330px);
+      padding: 24px 22px;
+      border: 1px solid #c3d3f022;
+      border-radius: 19px;
+      background: linear-gradient(145deg, #1b2436, #111725);
+      box-shadow: 0 16px 45px #02040b99, inset 0 1px #ffffff14;
+      text-align: center;
+    }
+    .game-menu-dialog h2 { margin: 0 0 5px; font-size: 1.5rem; }
+    .game-menu-dialog .button { width: 100%; }
+    .menu-secondary {
+      min-height: 42px;
+      padding: 9px 16px;
+      border: 1px solid #ffffff1c;
+      border-radius: 12px;
+      color: #d1d9e8;
+      background: #ffffff08;
+      font: inherit;
+      font-weight: 750;
+      cursor: pointer;
+    }
+    .menu-secondary:focus-visible { outline: 2px solid #cfb577; outline-offset: 3px; }
     .leaderboard-head {
       display: flex;
       align-items: center;
@@ -471,6 +507,14 @@
         </section>
       </div>
     </section>
+    <section class="game-menu-overlay" id="gameMenuOverlay" hidden>
+      <div class="game-menu-dialog" role="dialog" aria-modal="true" aria-labelledby="gameMenuTitle">
+        <h2 id="gameMenuTitle">Oyun menüsü</h2>
+        <button class="button" id="resumeGameButton" type="button">Devam et</button>
+        <button class="menu-secondary" id="restartGameButton" type="button">Baştan başla</button>
+        <button class="menu-secondary" id="mainMenuButton" type="button">Ana menü</button>
+      </div>
+    </section>
 
     <div class="instructions">
       <span>Sürükleyerek konum seç · parmağını kaldırınca bırak.</span>
@@ -483,6 +527,7 @@
     <div class="game-toolbar">
       <span class="combo-status" id="comboStatus" role="status" hidden></span>
       <div class="toolbar-actions">
+        <button class="leaderboard-toggle" id="openGameMenu" type="button" disabled>Menü</button>
         <button class="leaderboard-toggle" id="openLeaderboard" type="button">İlk 10</button>
         <button class="shuffle-button" id="shuffleButton" type="button" disabled>Karıştır (1)</button>
         <button class="sound-toggle" id="soundToggle" type="button" aria-pressed="false">Ses: Kapalı</button>
@@ -540,6 +585,11 @@
       const leaderboardOverlay = document.querySelector("#leaderboardOverlay");
       const openLeaderboardButton = document.querySelector("#openLeaderboard");
       const closeLeaderboardButton = document.querySelector("#closeLeaderboard");
+      const gameMenuOverlay = document.querySelector("#gameMenuOverlay");
+      const openGameMenuButton = document.querySelector("#openGameMenu");
+      const resumeGameButton = document.querySelector("#resumeGameButton");
+      const restartGameButton = document.querySelector("#restartGameButton");
+      const mainMenuButton = document.querySelector("#mainMenuButton");
 
       // Fill these from Supabase Project Settings > API. Never use a service_role key here.
       const SUPABASE_URL = "";
@@ -834,6 +884,7 @@
       let aimingPointerId = null;
       let canDrop = true;
       let active = false;
+      let paused = false;
       let gameOver = false;
       let lastFrame = 0;
       let accumulator = 0;
@@ -858,6 +909,50 @@
       function updateShuffleButton() {
         shuffleButton.disabled = !active || gameOver || shuffleUsed || animals.length < 2;
         shuffleButton.textContent = shuffleUsed ? "Karıştırıldı" : "Karıştır (1)";
+      }
+
+      function updateGameMenuButton() {
+        openGameMenuButton.disabled = !active || gameOver;
+      }
+
+      function openGameMenu() {
+        if (!active || gameOver || paused) return;
+        paused = true;
+        accumulator = 0;
+        gameMenuOverlay.hidden = false;
+        resumeGameButton.focus();
+        draw();
+      }
+
+      function resumeGame() {
+        if (gameMenuOverlay.hidden) return;
+        gameMenuOverlay.hidden = true;
+        paused = false;
+        lastFrame = 0;
+        accumulator = 0;
+        openGameMenuButton.focus();
+      }
+
+      function goToMainMenu() {
+        gameMenuOverlay.hidden = true;
+        paused = false;
+        active = false;
+        gameOver = false;
+        aimingPointerId = null;
+        overlayTitle.textContent = "Kozmik Birleştirme";
+        overlayText.textContent = "Gök cisimlerini bırak, eşleşenleri birleştir ve yıldız sistemini büyüt. Kütleyi kritik çizginin altında tut.";
+        scoreForm.hidden = false;
+        startButton.hidden = true;
+        scoreSubmitStatus.textContent = playerName
+          ? `Oyuncu: @${playerName}. Adını onaylayıp yeni sefer başlat.`
+          : "Supabase bağlı değil; yerel oynayabilirsin ancak kullanıcı adın ayrılmaz ve skorun çevrim içi kaydedilmez.";
+        if (playerName) playerNameInput.value = playerName;
+        if (!leaderboardConfigured) submitScoreButton.textContent = "Adınla yerel oyna";
+        overlay.hidden = false;
+        updateShuffleButton();
+        updateGameMenuButton();
+        draw();
+        playerNameInput.focus();
       }
 
       function playTone(frequency, duration, type, volume) {
@@ -1557,7 +1652,7 @@
       }
 
       function frame(now) {
-        if (active) {
+        if (active && !paused) {
           if (!lastFrame) lastFrame = now;
           accumulator += Math.min((now - lastFrame) / 1000, 0.05);
           lastFrame = now;
@@ -1575,7 +1670,10 @@
         if (gameOver) return;
         gameOver = true;
         active = false;
+        paused = false;
+        gameMenuOverlay.hidden = true;
         updateShuffleButton();
+        updateGameMenuButton();
         const isNewRecord = score > bestScore;
         if (isNewRecord) {
           bestScore = score;
@@ -1609,6 +1707,8 @@
         lastMergeAt = -Infinity;
         comboStatus.hidden = true;
         shuffleUsed = false;
+        paused = false;
+        gameMenuOverlay.hidden = true;
         brandMark.classList.remove("record-break");
         runStartedAt = performance.now();
         currentLevel = randomLevel();
@@ -1620,6 +1720,7 @@
         gameOver = false;
         active = true;
         updateShuffleButton();
+        updateGameMenuButton();
         scoreForm.hidden = true;
         startButton.hidden = true;
         scoreSubmitStatus.textContent = "";
@@ -1666,7 +1767,7 @@
       });
 
       window.addEventListener("keydown", event => {
-        if (!active || gameOver) return;
+        if (!active || paused || gameOver) return;
         if (event.key === "ArrowLeft" || event.key.toLowerCase() === "a") {
           event.preventDefault();
           setDropX(dropX - 24);
@@ -1685,6 +1786,10 @@
       startButton.textContent = "Yeni sefer";
       startButton.addEventListener("click", startGame);
       shuffleButton.addEventListener("click", shufflePlanets);
+      openGameMenuButton.addEventListener("click", openGameMenu);
+      resumeGameButton.addEventListener("click", resumeGame);
+      restartGameButton.addEventListener("click", startGame);
+      mainMenuButton.addEventListener("click", goToMainMenu);
       openLeaderboardButton.addEventListener("click", openLeaderboard);
       closeLeaderboardButton.addEventListener("click", closeLeaderboard);
       leaderboardOverlay.addEventListener("click", event => {
@@ -1692,6 +1797,7 @@
       });
       window.addEventListener("keydown", event => {
         if (event.key === "Escape" && !leaderboardOverlay.hidden) closeLeaderboard();
+        else if (event.key === "Escape" && !gameMenuOverlay.hidden) resumeGame();
       });
       scoreForm.addEventListener("submit", registerPlayerAndStart);
       playerNameInput.addEventListener("input", () => playerNameInput.setCustomValidity(""));
