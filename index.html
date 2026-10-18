@@ -963,8 +963,6 @@
       let nextLevel = 0;
       let next2Level = 0;
       let dropX = WIDTH / 2;
-      let lastDropX = null;
-      let sameLaneDropCount = 0;
       let aimingPointerId = null;
       let canDrop = true;
       let active = false;
@@ -1128,23 +1126,14 @@
         playTone(420 + currentLevel * 38, 0.08, "triangle", 0.025);
         const radius = radiusOf(currentLevel);
         setDropX(dropX);
-        const sameLane = lastDropX !== null && Math.abs(dropX - lastDropX) < 24;
-        sameLaneDropCount = sameLane ? sameLaneDropCount + 1 : 0;
-        lastDropX = dropX;
-        const blockedLane = animals.some(animal =>
-          Math.abs(animal.x - dropX) < animal.r + radius * 0.7
-          && animal.y > TOP_LINE + animal.r
-        );
-        const rollDirection = sameLaneDropCount % 2 === 0 ? 1 : -1;
         addAnimal(
           currentLevel,
           dropX,
           TOP_LINE + radius + 3,
-          blockedLane ? rollDirection * 240 : 0,
+          0,
           0,
           performance.now()
         );
-        animals[animals.length - 1].rollDirection = rollDirection;
         currentLevel = nextLevel;
         nextLevel = next2Level;
         next2Level = randomLevel();
@@ -1824,8 +1813,6 @@
         animals = [];
         particles = [];
         scoreBursts = [];
-        lastDropX = null;
-        sameLaneDropCount = 0;
         score = 0;
         comboCount = 0;
         lastMergeAt = -Infinity;
