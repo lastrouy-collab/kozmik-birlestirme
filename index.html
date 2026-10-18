@@ -726,10 +726,11 @@
         { name: "Galactic Core", radius: 128, color: "#bb4fd4", accent: "#ffe0ff", surface: "galaxy", ring: true, glow: true },
       ];
       const DIFFICULTY = {
-        maxDropLevel: 5,
+        minDropLevel: 1,
+        maxDropLevel: 6,
         gravity: 1680,
         dropCooldown: 490,
-        lineGrace: 0.3,
+        lineGrace: 0.24,
       };
       const leaderboardConfigured = /^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(SUPABASE_URL)
         && SUPABASE_ANON_KEY.length > 20;
@@ -985,7 +986,8 @@
       let accumulator = 0;
       let flash = 0;
       function randomLevel() {
-        return Math.floor(Math.random() * (DIFFICULTY.maxDropLevel + 1));
+        return DIFFICULTY.minDropLevel
+          + Math.floor(Math.random() * (DIFFICULTY.maxDropLevel - DIFFICULTY.minDropLevel + 1));
       }
 
       function radiusOf(level) {
